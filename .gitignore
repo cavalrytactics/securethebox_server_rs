@@ -1,2 +1,9 @@
 /target
-secrets
+secrets/*
+secrets.tar.gz
+secrets/*.json
+secrets/*.txt
+secrets/*.yaml
+secrets/*.yml
+secrets/*.tar
+.DS_Store
