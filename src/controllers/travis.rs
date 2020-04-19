@@ -1,13 +1,12 @@
 use flate2::write::GzEncoder;
 use flate2::Compression;
-use tar;
+use tar::Builder;
 
 use std::env;
 use std::fs;
 use std::fs::File;
-use std::path::Path;
-use std::path::PathBuf;
-use std::process::Command;
+use std::path::{Path, PathBuf};
+use std::process::{Command, Stdio};
 use std::io::ErrorKind::NotFound;
 
 pub struct Travis {
@@ -34,58 +33,49 @@ impl Travis {
             fs::remove_file("secrets.tar.gz")?;
             let tar_gz = File::create(&s)?;
             let enc = GzEncoder::new(tar_gz, Compression::default());
-            let mut tar = tar::Builder::new(enc);
+            let mut tar = Builder::new(enc);
             tar.append_dir_all("secrets", "secrets")?;
             Ok(())
         } else {
             println!("secrets.tar.gz does not exist");
             let tar_gz = File::create(&s)?;
             let enc = GzEncoder::new(tar_gz, Compression::default());
-            let mut tar = tar::Builder::new(enc);
+            let mut tar = Builder::new(enc);
             tar.append_dir_all("secrets", "secrets")?;
             Ok(())
         }
     }
     fn encrypt_tar_secrets(&mut self) {
         let s = "secrets.tar.gz".to_string();
-        let output = Command::new("travis")
-            .arg("encrypt-file")
-            .arg("-f")
-            .arg("-p")
-            .arg(s)
-            .output()
-            .expect("travis command failed to start");
-        let output_utf = String::from_utf8_lossy(&output.stdout);
-        if output.status.success() == true {
-            let mut decrypt_cmd = String::new();
-            let mut key_var_key = String::new();
-            let mut key_var_value = String::new();
-            let mut iv_var_key = String::new();
-            let mut iv_var_value = String::new();
-            for x in output_utf.lines() {
-                if x.contains("openssl aes-256-cbc") {
-                    decrypt_cmd = x.to_string();
-                    for s in decrypt_cmd.split_whitespace() {
-                        if s.contains("_key") {
-                            key_var_key = s.to_string()
-                        } else if s.contains("_iv") {
-                            iv_var_key = s.to_string()
+        match Command::new("travis").stdout(Stdio::null()).spawn(){
+            Ok(_) => {
+                let output = Command::new("travis")
+                    .arg("encrypt-file")
+                    .arg("-f")
+                    .arg("-p")
+                    .arg(s)
+                    .output()
+                    .expect("travis command failed to start");
+                let output_utf = String::from_utf8_lossy(&output.stdout);
+                if output.status.success() == true {
+                    for x in output_utf.lines() {
+                        if x.contains("openssl aes-256-cbc") {
+                            self.decrypt_cmd = x.to_string();
+                            for s in self.decrypt_cmd.split_whitespace() {
+                                if s.contains("_key") {
+                                    self.key_var_key = s.to_string();
+                                } else if s.contains("_iv") {
+                                    self.iv_var_key = s.to_string()
+                                }
+                            }
+                        } else if x.contains("key:") {
+                            self.key_var_value = x.trim_start_matches("key: ").to_string()
+                        } else if x.contains("iv:") {
+                            self.iv_var_value = x.trim_start_matches("iv: ").to_string()
                         }
                     }
-                } else if x.contains("key:") {
-                    key_var_value = x.trim_start_matches("key: ").to_string()
-                } else if x.contains("iv:") {
-                    iv_var_value = x.trim_start_matches("iv: ").to_string()
                 }
-            }
-            self.decrypt_cmd = decrypt_cmd.to_string();
-            self.key_var_key = key_var_key.to_string();
-            self.key_var_value = key_var_value.to_string();
-            self.iv_var_key = iv_var_key.to_string();
-            self.iv_var_value = iv_var_value.to_string();
-        } else {
-            match Command::new("travis").spawn() {
-                Ok(_) => println!("Was spawned :)"),
+            },
                 Err(e) => {
                     if let NotFound = e.kind() {
                         println!("`travis` was not found! Check your PATH!");
@@ -95,8 +85,8 @@ impl Travis {
                     }
                 }, 
             }
-        }
     }
+    
 
     fn add_openssl_cmd(&mut self) -> bool {
         let ty = ".travis.yml".to_string();
