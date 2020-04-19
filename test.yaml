@@ -1,4 +1,5 @@
----
+dist: bionic
+services: docker
 jobs:
   allow_failures:
     - rust: beta nightly
@@ -18,14 +19,11 @@ jobs:
       - pwd
       - ls
     language: rust
-    os: linux
     rust: stable
     script:
       - pwd
       - cargo build --verbose --all
       - cargo test --verbose --all
-    services:
-      - docker
 language: rust
 rust:
   - stable
