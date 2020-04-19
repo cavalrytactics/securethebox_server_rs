@@ -17,8 +17,6 @@ pub struct Travis {
     key_var_value: String,
     iv_var_key: String,
     iv_var_value: String,
-    key_env_var: String,
-    iv_env_var: String
 }
 
 impl Travis {
@@ -63,8 +61,6 @@ impl Travis {
             let mut key_var_value = String::new();
             let mut iv_var_key = String::new();
             let mut iv_var_value = String::new();
-            let key_env_var = String::new();
-            let iv_env_var = String::new();
             for x in output_utf.lines() {
                 if x.contains("openssl aes-256-cbc") {
                     decrypt_cmd = x.to_string();
@@ -81,15 +77,11 @@ impl Travis {
                     iv_var_value = x.trim_start_matches("iv: ").to_string()
                 }
             }
-            println!("decrypt_cmd: {}", decrypt_cmd);
-            println!("key_var_key: {}", key_var_key);
-            println!("key_var_value: {}", key_var_value);
-            println!("iv_var_key: {}", iv_var_key);
-            println!("iv_var_value: {}", iv_var_value);
-            println!("key_env_var: {}", key_env_var);
-            println!("iv_env_var: {}", iv_env_var);
-
             self.decrypt_cmd = decrypt_cmd.to_string();
+            self.key_var_key = key_var_key.to_string();
+            self.key_var_value = key_var_value.to_string();
+            self.iv_var_key = iv_var_key.to_string();
+            self.iv_var_value = iv_var_value.to_string();
         }
     }
 
@@ -115,8 +107,7 @@ impl Travis {
     fn decrypt_tar_secrets(self) {
         let u = "secrets.tar.gz".to_string();
         let e = "secrets.tar.gz.enc".to_string();
-        // [f"openssl aes-256-cbc -K {keyVariableVALUE} -iv {ivVariableVALUE} -in {encryptedFileName} -out {unencryptedFileName} -d"], shell=True).wait()
-        let output = Command::new("openssl")
+        let _ = Command::new("openssl")
             .arg("aes-256-cbc")
             .arg("-K")
             .arg(self.key_var_value)
@@ -136,6 +127,10 @@ pub fn set_file_name(arg_file_name: &str) -> bool {
         current_directory: PathBuf::new(),
         file_name: String::new(),
         decrypt_cmd: String::new(),
+        key_var_key: String::new(),
+        key_var_value: String::new(),
+        iv_var_key: String::new(),
+        iv_var_value: String::new(),
     };
     c.set_file_name(arg_file_name);
     if c.file_name == arg_file_name {
@@ -151,6 +146,10 @@ pub fn set_current_directory() -> bool {
         current_directory: PathBuf::new(),
         file_name: String::new(),
         decrypt_cmd: String::new(),
+        key_var_key: String::new(),
+        key_var_value: String::new(),
+        iv_var_key: String::new(),
+        iv_var_value: String::new(),
     };
     c.set_current_directory();
     if c.current_directory != PathBuf::new() {
@@ -166,6 +165,10 @@ pub fn tar_secrets_directory() -> bool {
         current_directory: PathBuf::new(),
         file_name: String::new(),
         decrypt_cmd: String::new(),
+        key_var_key: String::new(),
+        key_var_value: String::new(),
+        iv_var_key: String::new(),
+        iv_var_value: String::new(),
     };
     c.set_current_directory();
     let _ = c.tar_secrets_directory();
@@ -182,6 +185,10 @@ pub fn encrypt_tar_secrets() -> bool {
         current_directory: PathBuf::new(),
         file_name: String::new(),
         decrypt_cmd: String::new(),
+        key_var_key: String::new(),
+        key_var_value: String::new(),
+        iv_var_key: String::new(),
+        iv_var_value: String::new(),
     };
     c.set_current_directory();
     let _ = c.encrypt_tar_secrets();
@@ -198,6 +205,10 @@ pub fn add_openssl_cmd() -> bool {
         current_directory: PathBuf::new(),
         file_name: String::new(),
         decrypt_cmd: String::new(),
+        key_var_key: String::new(),
+        key_var_value: String::new(),
+        iv_var_key: String::new(),
+        iv_var_value: String::new(),
     };
     c.set_current_directory();
     c.encrypt_tar_secrets();
