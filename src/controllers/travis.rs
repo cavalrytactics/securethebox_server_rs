@@ -94,8 +94,8 @@ impl Travis {
     }
 
     fn add_openssl_cmd(self) -> bool {
-        let ty = ".travis.yaml".to_string();
-        let f = fs::read_to_string(".travis.yaml");
+        let ty = ".travis.yml".to_string();
+        let f = fs::read_to_string(".travis.yml");
         let v: serde_json::Value = serde_yaml::from_str(&f.unwrap()).unwrap();
         let mut j = serde_json::json!(&v);
         let bi = j["jobs"]["include"]["before_install"]
@@ -103,9 +103,9 @@ impl Travis {
             .unwrap();
         let before_install = v["jobs"]["include"]["before_install"].to_string();
         if before_install.contains(&self.decrypt_cmd) == true {
-            println!("decrypt cmd already in .travis.yaml")
+            println!("decrypt cmd already in .travis.yml")
         } else {
-            println!("decrypt_cmd not in .travis.yaml");
+            println!("decrypt_cmd not in .travis.yml");
             bi.push(serde_yaml::from_str(&self.decrypt_cmd.to_string()).unwrap());
         }
         let _ = serde_yaml::to_writer(fs::File::create(ty).unwrap(), &j);
