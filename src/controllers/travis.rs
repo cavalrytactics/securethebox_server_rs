@@ -1,7 +1,8 @@
 use flate2::write::GzEncoder;
-use flate2::read::GzDecoder;
+use flate2::write::GzDecoder;
 use flate2::Compression;
-use tar::{Builder,Archive};
+use tar::Builder;
+use tar::Archive;
 
 use std::env;
 use std::fs;
@@ -48,13 +49,19 @@ impl Travis {
         }
     }
     fn tar_decompress_secrets_directory(&mut self) -> Result<(), Error> {
-        let s = "secrets.tar.gz".to_string();
-        if Path::new(&s).exists() == true {
-            println!("secrets.tar.gz exists");
-            let tar_gz = File::open(&s)?;
-            let enc = GzDecoder::new(tar_gz);
-            let mut tar = Archive::new(enc);
-            tar.unpack(".")?;
+        let s = "secrets.tar.gz";
+        let p = "secrets";
+        if Path::new(s).exists() == true {
+            let tar_gz = File::open(s)?;  
+            let tar = GzDecoder::new(tar_gz);
+            let mut archive = Archive::new(tar);
+            if Path::new(p).exists() == true {
+                println!("decompressed secrets already exists!");
+                println!("you are running this locally");
+            } else {
+                archive.unpack(".")?;
+                println!("secrets decompressed");
+            }
             Ok(())
         } else {
             println!("secrets.tar.gz does not exist");
@@ -62,7 +69,7 @@ impl Travis {
         }
     }
     fn encrypt_tar_secrets(&mut self) {
-        let s = "secrets.tar.gz".to_string();
+        let s = "secrets.tar.gz";
         match Command::new("travis").stdout(Stdio::null()).spawn(){
             Ok(_) => {
                 let output = Command::new("travis")
@@ -85,9 +92,13 @@ impl Travis {
                                 }
                             }
                         } else if x.contains("key:") {
-                            self.key_var_value = x.trim_start_matches("key: ").to_string()
+                            self.key_var_value = x.trim_start_matches("key: ")
+                                                  .trim_start()
+                                                  .to_string();
                         } else if x.contains("iv:") {
-                            self.iv_var_value = x.trim_start_matches("iv: ").to_string()
+                            self.iv_var_value = x.trim_start_matches("iv: ")
+                                                 .trim_start()
+                                                 .to_string();
                         }
                     }
                 }
@@ -95,7 +106,7 @@ impl Travis {
             Err(e) => {
                 if let NotFound = e.kind() {
                     println!("`travis` was not found! Check your PATH!");
-                    println!("If in Travis, ignore");
+                    println!("If you see this in Travis-CI, ignore");
                 } else {
                     println!("Some strange error occurred :(");
                 }
@@ -103,7 +114,7 @@ impl Travis {
         }
     }
     
-    fn add_openssl_cmd(&mut self) -> bool {
+    fn add_openssl_cmd(&mut self) {
         let ty = ".travis.yml".to_string();
         let f = fs::read_to_string(".travis.yml");
         let v: serde_json::Value = serde_yaml::from_str(&f.unwrap()).unwrap();
@@ -113,18 +124,22 @@ impl Travis {
             .unwrap();
         let before_install = v["jobs"]["include"]["before_install"].to_string();
         if before_install.contains(&self.decrypt_cmd) == true {
-            println!("decrypt cmd already in .travis.yml")
+            println!("decrypt_cmd already in .travis.yml")
         } else {
-            println!("decrypt_cmd not in .travis.yml");
+            println!("decrypt_cmd not in .travis.yml, adding...");
             bi.push(serde_yaml::from_str(&self.decrypt_cmd).unwrap());
         }
         let _ = serde_yaml::to_writer(fs::File::create(ty).unwrap(), &j);
-        true
     }
     
-    fn decrypt_tar_secrets(&mut self) -> bool {
-        let u = "secrets.tar.gz".to_string();
-        let e = "secrets.tar.gz.enc".to_string();
+    fn decrypt_tar_secrets(&mut self) {
+        if Path::new("secrets.tar.gz").exists() == true {
+            let _ = fs::remove_file("secrets.tar.gz");
+            println!("deleted secrets.tar.gz")
+        }
+
+        let e = "secrets.tar.gz.enc";
+        let u = "secrets.tar.gz";
         let _ = Command::new("openssl")
             .arg("aes-256-cbc")
             .arg("-K")
@@ -135,9 +150,12 @@ impl Travis {
             .arg(e)
             .arg("-out")
             .arg(u)
+            .arg("-d")
             .output()
             .expect("travis command failed to start");
-        true
+        if Path::new("secrets.tar.gz").exists() == true {
+            println!("secrets.tar.gz exists")
+        }
     }
 }
 
@@ -230,30 +248,10 @@ pub fn encrypt_tar_secrets() -> bool {
         iv_var_value: String::new(),
     };
     c.set_current_directory();
-    let _ = c.encrypt_tar_secrets();
+    c.encrypt_tar_secrets();
+    c.add_openssl_cmd();
     if Path::new("secrets.tar.gz.enc").exists() == true {
         println!("secrets tar is encrypted");
-        true
-    } else {
-        false
-    }
-}
-
-pub fn add_openssl_cmd() -> bool {
-    let mut c = Travis {
-        current_directory: PathBuf::new(),
-        file_name: String::new(),
-        decrypt_cmd: String::new(),
-        key_var_key: String::new(),
-        key_var_value: String::new(),
-        iv_var_key: String::new(),
-        iv_var_value: String::new(),
-    };
-    c.set_current_directory();
-    c.encrypt_tar_secrets();
-    let r = c.add_openssl_cmd();
-    if r == true {
-        println!("openssl command added");
         true
     } else {
         false
@@ -271,10 +269,13 @@ pub fn decrypt_tar_secrets() -> bool {
         iv_var_value: String::new(),
     };
     c.set_current_directory();
+    let _ = c.tar_compress_secrets_directory();
     c.encrypt_tar_secrets();
-    let r1 = c.add_openssl_cmd();
-    let r2 = c.decrypt_tar_secrets();
-    if r1 == true && r2 == true {
+    c.add_openssl_cmd();
+    c.decrypt_tar_secrets();
+    let _ = c.tar_decompress_secrets_directory();
+    if Path::new("secrets.tar.gz").exists() == true {
+        println!("secrets tar is decrypted");
         true
     } else {
         false

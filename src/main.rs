@@ -1,4 +1,4 @@
-
+use securethebox_server_rs::controllers::travis;
 fn main() {
-   println!("Hello")
+   let _ = travis::decrypt_tar_secrets();
 }
