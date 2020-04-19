@@ -1,5 +1,5 @@
+---
 dist: bionic
-services: docker
 jobs:
   allow_failures:
     - rust: beta nightly
@@ -29,3 +29,4 @@ rust:
   - stable
   - beta
   - nightly
+services: docker

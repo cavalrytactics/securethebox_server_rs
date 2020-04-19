@@ -1,8 +1,7 @@
-extern crate flate2;
-extern crate tar;
-
 use flate2::write::GzEncoder;
 use flate2::Compression;
+use tar;
+
 use std::env;
 use std::fs;
 use std::fs::File;
@@ -13,7 +12,13 @@ use std::process::Command;
 pub struct Travis {
     current_directory: PathBuf,
     file_name: String,
-    decrypt_cmd: String
+    decrypt_cmd: String,
+    key_var_key: String,
+    key_var_value: String,
+    iv_var_key: String,
+    iv_var_value: String,
+    key_env_var: String,
+    iv_env_var: String
 }
 
 impl Travis {
@@ -24,17 +29,18 @@ impl Travis {
         self.current_directory = env::current_dir().unwrap();
     }
     fn tar_secrets_directory(self) -> Result<(), std::io::Error> {
-        if Path::new("secrets.tar.gz").exists() == true {
+        let s = "secrets.tar.gz".to_string();
+        if Path::new(&s).exists() == true {
             println!("secrets.tar.gz exists");
             fs::remove_file("secrets.tar.gz")?;
-            let tar_gz = File::create("secrets.tar.gz")?;
+            let tar_gz = File::create(&s)?;
             let enc = GzEncoder::new(tar_gz, Compression::default());
             let mut tar = tar::Builder::new(enc);
             tar.append_dir_all("secrets", "secrets")?;
             Ok(())
         } else {
             println!("secrets.tar.gz does not exist");
-            let tar_gz = File::create("secrets.tar.gz")?;
+            let tar_gz = File::create(&s)?;
             let enc = GzEncoder::new(tar_gz, Compression::default());
             let mut tar = tar::Builder::new(enc);
             tar.append_dir_all("secrets", "secrets")?;
@@ -42,11 +48,12 @@ impl Travis {
         }
     }
     fn encrypt_tar_secrets(&mut self) {
+        let s = "secrets.tar.gz".to_string();
         let output = Command::new("travis")
             .arg("encrypt-file")
             .arg("-f")
             .arg("-p")
-            .arg("secrets.tar.gz")
+            .arg(s)
             .output()
             .expect("travis command failed to start");
         let output_utf = String::from_utf8_lossy(&output.stdout);
@@ -81,10 +88,7 @@ impl Travis {
             println!("iv_var_value: {}", iv_var_value);
             println!("key_env_var: {}", key_env_var);
             println!("iv_env_var: {}", iv_env_var);
-            let source_file_path = "secrets.tar.gz";
-            if Path::new(source_file_path).exists() == true {
-                let _ = fs::remove_file(source_file_path);
-            }
+
             self.decrypt_cmd = decrypt_cmd.to_string();
         }
     }
@@ -106,6 +110,24 @@ impl Travis {
         }
         let _ = serde_yaml::to_writer(fs::File::create(ty).unwrap(), &j);
         true
+    }
+    
+    fn decrypt_tar_secrets(self) {
+        let u = "secrets.tar.gz".to_string();
+        let e = "secrets.tar.gz.enc".to_string();
+        // [f"openssl aes-256-cbc -K {keyVariableVALUE} -iv {ivVariableVALUE} -in {encryptedFileName} -out {unencryptedFileName} -d"], shell=True).wait()
+        let output = Command::new("openssl")
+            .arg("aes-256-cbc")
+            .arg("-K")
+            .arg(self.key_var_value)
+            .arg("-iv")
+            .arg(self.iv_var_value)
+            .arg("-in")
+            .arg(e)
+            .arg("-out")
+            .arg(u)
+            .output()
+            .expect("travis command failed to start");
     }
 }
 
