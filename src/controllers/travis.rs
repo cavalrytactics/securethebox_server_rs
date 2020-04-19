@@ -8,6 +8,7 @@ use std::fs::File;
 use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
+use std::io::ErrorKind::NotFound;
 
 pub struct Travis {
     current_directory: PathBuf,
@@ -26,7 +27,7 @@ impl Travis {
     fn set_current_directory(&mut self) {
         self.current_directory = env::current_dir().unwrap();
     }
-    fn tar_secrets_directory(self) -> Result<(), std::io::Error> {
+    fn tar_secrets_directory(&mut self) -> Result<(), std::io::Error> {
         let s = "secrets.tar.gz".to_string();
         if Path::new(&s).exists() == true {
             println!("secrets.tar.gz exists");
@@ -82,10 +83,22 @@ impl Travis {
             self.key_var_value = key_var_value.to_string();
             self.iv_var_key = iv_var_key.to_string();
             self.iv_var_value = iv_var_value.to_string();
+        } else {
+            match Command::new("travis").spawn() {
+                Ok(_) => println!("Was spawned :)"),
+                Err(e) => {
+                    if let NotFound = e.kind() {
+                        println!("`travis` was not found! Check your PATH!");
+                        println!("If in Travis, ignore");
+                    } else {
+                        println!("Some strange error occurred :(");
+                    }
+                }, 
+            }
         }
     }
 
-    fn add_openssl_cmd(self) -> bool {
+    fn add_openssl_cmd(&mut self) -> bool {
         let ty = ".travis.yml".to_string();
         let f = fs::read_to_string(".travis.yml");
         let v: serde_json::Value = serde_yaml::from_str(&f.unwrap()).unwrap();
@@ -98,27 +111,28 @@ impl Travis {
             println!("decrypt cmd already in .travis.yml")
         } else {
             println!("decrypt_cmd not in .travis.yml");
-            bi.push(serde_yaml::from_str(&self.decrypt_cmd.to_string()).unwrap());
+            bi.push(serde_yaml::from_str(&self.decrypt_cmd).unwrap());
         }
         let _ = serde_yaml::to_writer(fs::File::create(ty).unwrap(), &j);
         true
     }
     
-    fn decrypt_tar_secrets(self) {
+    fn decrypt_tar_secrets(&mut self) -> bool {
         let u = "secrets.tar.gz".to_string();
         let e = "secrets.tar.gz.enc".to_string();
         let _ = Command::new("openssl")
             .arg("aes-256-cbc")
             .arg("-K")
-            .arg(self.key_var_value)
+            .arg(&self.key_var_value)
             .arg("-iv")
-            .arg(self.iv_var_value)
+            .arg(&self.iv_var_value)
             .arg("-in")
             .arg(e)
             .arg("-out")
             .arg(u)
             .output()
             .expect("travis command failed to start");
+        true
     }
 }
 
@@ -212,9 +226,30 @@ pub fn add_openssl_cmd() -> bool {
     };
     c.set_current_directory();
     c.encrypt_tar_secrets();
-    let result = c.add_openssl_cmd();
-    if result == true {
+    let r = c.add_openssl_cmd();
+    if r == true {
         println!("openssl command added");
+        true
+    } else {
+        false
+    }
+}
+
+pub fn decrypt_tar_secrets() -> bool {
+    let mut c = Travis {
+        current_directory: PathBuf::new(),
+        file_name: String::new(),
+        decrypt_cmd: String::new(),
+        key_var_key: String::new(),
+        key_var_value: String::new(),
+        iv_var_key: String::new(),
+        iv_var_value: String::new(),
+    };
+    c.set_current_directory();
+    c.encrypt_tar_secrets();
+    let r1 = c.add_openssl_cmd();
+    let r2 = c.decrypt_tar_secrets();
+    if r1 == true && r2 == true {
         true
     } else {
         false

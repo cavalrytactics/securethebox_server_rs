@@ -24,3 +24,8 @@ fn test_encrypt_tar_secrets() {
 fn test_add_openssl_cmd() {
     assert_eq!(travis::add_openssl_cmd(), true);
 }
+
+#[test]
+fn test_decrypt_tar_secrets() {
+    assert_eq!(travis::decrypt_tar_secrets(), true);
+}
