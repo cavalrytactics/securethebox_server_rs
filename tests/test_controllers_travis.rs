@@ -11,8 +11,13 @@ fn test_set_current_directory() {
 }
 
 #[test]
-fn test_tar_secrets_directory() {
-    assert_eq!(travis::tar_secrets_directory(), true);
+fn test_tar_compress_secrets_directory() {
+    assert_eq!(travis::tar_compress_secrets_directory(), true);
+}
+
+#[test]
+fn test_tar_decompress_secrets_directory() {
+    assert_eq!(travis::tar_decompress_secrets_directory(), true);
 }
 
 #[test]

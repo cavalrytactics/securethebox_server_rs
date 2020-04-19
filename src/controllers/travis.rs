@@ -1,12 +1,14 @@
 use flate2::write::GzEncoder;
+use flate2::read::GzDecoder;
 use flate2::Compression;
-use tar::Builder;
+use tar::{Builder,Archive};
 
 use std::env;
 use std::fs;
 use std::fs::File;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
+use std::io::Error;
 use std::io::ErrorKind::NotFound;
 
 pub struct Travis {
@@ -26,7 +28,7 @@ impl Travis {
     fn set_current_directory(&mut self) {
         self.current_directory = env::current_dir().unwrap();
     }
-    fn tar_secrets_directory(&mut self) -> Result<(), std::io::Error> {
+    fn tar_compress_secrets_directory(&mut self) -> Result<(), Error> {
         let s = "secrets.tar.gz".to_string();
         if Path::new(&s).exists() == true {
             println!("secrets.tar.gz exists");
@@ -42,6 +44,20 @@ impl Travis {
             let enc = GzEncoder::new(tar_gz, Compression::default());
             let mut tar = Builder::new(enc);
             tar.append_dir_all("secrets", "secrets")?;
+            Ok(())
+        }
+    }
+    fn tar_decompress_secrets_directory(&mut self) -> Result<(), Error> {
+        let s = "secrets.tar.gz".to_string();
+        if Path::new(&s).exists() == true {
+            println!("secrets.tar.gz exists");
+            let tar_gz = File::open(&s)?;
+            let enc = GzDecoder::new(tar_gz);
+            let mut tar = Archive::new(enc);
+            tar.unpack(".")?;
+            Ok(())
+        } else {
+            println!("secrets.tar.gz does not exist");
             Ok(())
         }
     }
@@ -76,18 +92,17 @@ impl Travis {
                     }
                 }
             },
-                Err(e) => {
-                    if let NotFound = e.kind() {
-                        println!("`travis` was not found! Check your PATH!");
-                        println!("If in Travis, ignore");
-                    } else {
-                        println!("Some strange error occurred :(");
-                    }
-                }, 
-            }
+            Err(e) => {
+                if let NotFound = e.kind() {
+                    println!("`travis` was not found! Check your PATH!");
+                    println!("If in Travis, ignore");
+                } else {
+                    println!("Some strange error occurred :(");
+                }
+            }, 
+        }
     }
     
-
     fn add_openssl_cmd(&mut self) -> bool {
         let ty = ".travis.yml".to_string();
         let f = fs::read_to_string(".travis.yml");
@@ -164,7 +179,7 @@ pub fn set_current_directory() -> bool {
     }
 }
 
-pub fn tar_secrets_directory() -> bool {
+pub fn tar_compress_secrets_directory() -> bool {
     let mut c = Travis {
         current_directory: PathBuf::new(),
         file_name: String::new(),
@@ -175,9 +190,29 @@ pub fn tar_secrets_directory() -> bool {
         iv_var_value: String::new(),
     };
     c.set_current_directory();
-    let _ = c.tar_secrets_directory();
+    let _ = c.tar_compress_secrets_directory();
     if Path::new("secrets.tar.gz").exists() == true {
-        println!("secrets are tar'd");
+        println!("tar compressed");
+        true
+    } else {
+        false
+    }
+}
+
+pub fn tar_decompress_secrets_directory() -> bool {
+    let mut c = Travis {
+        current_directory: PathBuf::new(),
+        file_name: String::new(),
+        decrypt_cmd: String::new(),
+        key_var_key: String::new(),
+        key_var_value: String::new(),
+        iv_var_key: String::new(),
+        iv_var_value: String::new(),
+    };
+    c.set_current_directory();
+    let _ = c.tar_decompress_secrets_directory();
+    if Path::new("secrets/secret.txt").exists() == true {
+        println!("tar decompressed");
         true
     } else {
         false
