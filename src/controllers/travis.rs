@@ -91,6 +91,7 @@ impl Travis {
                                     self.iv_var_key = s.to_string()
                                 }
                             }
+                            
                         } else if x.contains("key:") {
                             self.key_var_value = x.trim_start_matches("key: ")
                                                   .trim_start()
@@ -101,6 +102,16 @@ impl Travis {
                                                  .to_string();
                         }
                     }
+                    // Write to file to stay static
+                    // with open("./secrets/travis-openssl-keys-values.txt","w") as f:
+                    //     f.write(f"{keyVariableKEY}={self.encryptedEnvironmentVariables[keyVariableKEY]},")
+                    //     f.write(f"{ivVariableKEY}={self.encryptedEnvironmentVariables[ivVariableKEY]}")
+                    // with open("./secrets/travis-openssl-keys","w") as f:
+                    //     f.write(f"{keyVariableKEY},{ivVariableKEY}")
+                    let sec_kv_p = "secrets/travis-openssl-keys-values.txt";
+                    let skvf = fs::File::create(sec_kv_p);
+                    skvf.write_all("{}".as_bytes(), &self.key_var_key)
+                    
                 }
             },
             Err(e) => {
