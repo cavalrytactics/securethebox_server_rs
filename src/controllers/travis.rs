@@ -1,5 +1,5 @@
 use flate2::write::GzEncoder;
-use flate2::write::GzDecoder;
+use flate2::read::GzDecoder;
 use flate2::Compression;
 use tar::Builder;
 use tar::Archive;
@@ -32,7 +32,6 @@ impl Travis {
     fn tar_compress_secrets_directory(&mut self) -> Result<(), Error> {
         let s = "secrets.tar.gz".to_string();
         if Path::new(&s).exists() == true {
-            println!("secrets.tar.gz exists");
             fs::remove_file("secrets.tar.gz")?;
             let tar_gz = File::create(&s)?;
             let enc = GzEncoder::new(tar_gz, Compression::default());
@@ -40,7 +39,6 @@ impl Travis {
             tar.append_dir_all("secrets", "secrets")?;
             Ok(())
         } else {
-            println!("secrets.tar.gz does not exist");
             let tar_gz = File::create(&s)?;
             let enc = GzEncoder::new(tar_gz, Compression::default());
             let mut tar = Builder::new(enc);
@@ -51,21 +49,24 @@ impl Travis {
     fn tar_decompress_secrets_directory(&mut self) -> Result<(), Error> {
         let s = "secrets.tar.gz";
         let p = "secrets";
+
         if Path::new(s).exists() == true {
+            println!("s exists");
             let tar_gz = File::open(s)?;  
             let tar = GzDecoder::new(tar_gz);
             let mut archive = Archive::new(tar);
+            println!("archive created");
+
             if Path::new(p).exists() == true {
-                println!("decompressed secrets already exists!");
-                println!("you are running this locally");
+                println!("secrets path exist");
                 Ok(())
             } else {
+                println!("tar unpacked {:?}",archive.unpack(".").unwrap());
                 archive.unpack(".")?;
-                println!("secrets decompressed");
                 Ok(())
             }
         } else {
-            println!("secrets.tar.gz does not exist");
+            println!("error....");
             Ok(())
         }
     }
@@ -122,7 +123,7 @@ impl Travis {
                     }
                     //thread2
                     {
-                        let sec_k_p = "secrets/travis-openssl-keys";
+                        let sec_k_p = ".travis-openssl-keys";
                         let mut skf = fs::File::create(sec_k_p)?;
                         let sks = std::format!("{},{}",
                             &self.key_var_key.to_string(), 
@@ -170,7 +171,7 @@ impl Travis {
         // get decrypt values from injected env (used for ci)
         {
             // get keys from file
-            let f = fs::read_to_string("secrets/travis-openssl-keys");
+            let f = fs::read_to_string(".travis-openssl-keys");
             for s in f.unwrap().lines() { 
                 let d: Vec<_> = s.split(",").collect();
                 self.key_var_key = d[0].to_string();
@@ -305,11 +306,13 @@ pub fn tar_decompress_secrets_directory() -> bool {
         iv_var_value: String::new(),
     };
     c.set_current_directory();
+    let _ = c.tar_compress_secrets_directory();
     let _ = c.tar_decompress_secrets_directory();
-    if Path::new("secrets/secret.txt").exists() == true {
+    if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
         println!("tar decompressed");
         true
     } else {
+        println!("error");
         false
     }
 }
