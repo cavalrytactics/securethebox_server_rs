@@ -1,4 +1,17 @@
 # securethebox_server_rs
+- Building
+```
+cargo build
+```
+- Running
+```
+cargo run
+```
+- Testing
+```
+cargo test
+```
+
 - Recommended Cargo Tools
 ```
 cargo-watch
@@ -19,12 +32,12 @@ alias cwr="cargo-watch -c -i test.rs -i test.yml -i .travis.yml -i target/* -i s
 
 - Recommended Terminal Split
 ```
+mainTerm:
+cwr
+
 term1:
 cwc
 
 term2:
 cwt
-
-mainTerm:
-cwr
 ```

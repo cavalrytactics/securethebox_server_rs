@@ -1,11 +1,8 @@
-//for tar
 use flate2::write::GzEncoder;
 use flate2::write::GzDecoder;
 use flate2::Compression;
 use tar::Builder;
 use tar::Archive;
-
-//for files
 use std::env;
 use std::fs;
 use std::fs::File;
@@ -61,11 +58,12 @@ impl Travis {
             if Path::new(p).exists() == true {
                 println!("decompressed secrets already exists!");
                 println!("you are running this locally");
+                Ok(())
             } else {
                 archive.unpack(".")?;
                 println!("secrets decompressed");
+                Ok(())
             }
-            Ok(())
         } else {
             println!("secrets.tar.gz does not exist");
             Ok(())
@@ -108,13 +106,13 @@ impl Travis {
                     {
                         let sec_kv_p = "secrets/travis-openssl-keys-values.txt";
                         let mut skvf = fs::File::create(sec_kv_p)?;
-                        let mut skvs = std::format!("{}={}\n{}={}",
+                        let skvs = std::format!("{}={}\n{}={}",
                             &self.key_var_key.to_string(), 
                             &self.key_var_value.to_string(),
                             &self.iv_var_key.to_string(), 
                             &self.iv_var_value.to_string()
                         );
-                        skvf.write_all(&skvs.as_bytes());
+                        let _ = skvf.write_all(&skvs.as_bytes());
                         env::set_var(
                             &self.key_var_key.to_string(), 
                             &self.key_var_value.to_string());
@@ -126,11 +124,11 @@ impl Travis {
                     {
                         let sec_k_p = "secrets/travis-openssl-keys";
                         let mut skf = fs::File::create(sec_k_p)?;
-                        let mut sks = std::format!("{},{}",
+                        let sks = std::format!("{},{}",
                             &self.key_var_key.to_string(), 
                             &self.iv_var_key.to_string(), 
                         );
-                        skf.write_all(&sks.as_bytes());
+                        let _ = skf.write_all(&sks.as_bytes());
                     }
                 }
             },
@@ -327,7 +325,7 @@ pub fn encrypt_tar_secrets() -> bool {
         iv_var_value: String::new(),
     };
     c.set_current_directory();
-    c.encrypt_tar_secrets();
+    let _ = c.encrypt_tar_secrets();
     c.add_openssl_cmd();
     if Path::new("secrets.tar.gz.enc").exists() == true {
         println!("secrets tar is encrypted");
@@ -349,7 +347,7 @@ pub fn decrypt_tar_secrets() -> bool {
     };
     c.set_current_directory();
     let _ = c.tar_compress_secrets_directory();
-    c.encrypt_tar_secrets();
+    let _ = c.encrypt_tar_secrets();
     c.add_openssl_cmd();
     c.decrypt_tar_secrets();
     let _ = c.tar_decompress_secrets_directory();
