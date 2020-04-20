@@ -72,6 +72,7 @@ impl Travis {
     }
     fn encrypt_tar_secrets(&mut self) -> Result<(), Error>{
         let s = "secrets.tar.gz";
+        // if travis binary not installed, install it (except ci)
         match Command::new("travis").stdout(Stdio::null()).spawn(){
             Ok(_) => {
                 let output = Command::new("travis")

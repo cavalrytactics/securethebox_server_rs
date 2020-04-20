@@ -1,4 +1,8 @@
 # securethebox_server_rs
+## Requirements
+- [travis-ci cli](https://github.com/travis-ci/travis.rb#mac-os-x-via-homebrew)
+- [Rust](https://www.rust-lang.org/tools/install)
+
 - Building
 ```
 cargo build
@@ -13,10 +17,8 @@ cargo test
 ```
 
 - Recommended Cargo Tools
-```
-cargo-watch
-cargo-outdated
-```
+- [cargo-watch](https://github.com/passcod/cargo-watch)
+- [cargo-outdated](https://github.com/kbknapp/cargo-outdated)
 
 - Recommended Aliases
 ```
