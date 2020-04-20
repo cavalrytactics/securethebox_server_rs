@@ -11,6 +11,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use std::io::Error;
 use std::io::ErrorKind::NotFound;
+use std::io::prelude::*;
 
 pub struct Travis {
     current_directory: PathBuf,
@@ -68,7 +69,7 @@ impl Travis {
             Ok(())
         }
     }
-    fn encrypt_tar_secrets(&mut self) {
+    fn encrypt_tar_secrets(&mut self) -> Result<(), Error>{
         let s = "secrets.tar.gz";
         match Command::new("travis").stdout(Stdio::null()).spawn(){
             Ok(_) => {
@@ -102,16 +103,28 @@ impl Travis {
                                                  .to_string();
                         }
                     }
-                    // Write to file to stay static
-                    // with open("./secrets/travis-openssl-keys-values.txt","w") as f:
-                    //     f.write(f"{keyVariableKEY}={self.encryptedEnvironmentVariables[keyVariableKEY]},")
-                    //     f.write(f"{ivVariableKEY}={self.encryptedEnvironmentVariables[ivVariableKEY]}")
-                    // with open("./secrets/travis-openssl-keys","w") as f:
-                    //     f.write(f"{keyVariableKEY},{ivVariableKEY}")
-                    let sec_kv_p = "secrets/travis-openssl-keys-values.txt";
-                    let skvf = fs::File::create(sec_kv_p);
-                    skvf.write_all("{}".as_bytes(), &self.key_var_key)
-                    
+                    //thread1
+                    {
+                        let sec_kv_p = "secrets/travis-openssl-keys-values.txt";
+                        let mut skvf = fs::File::create(sec_kv_p)?;
+                        let mut skvs = std::format!("{}={}\n{}={}",
+                            &self.key_var_key.to_string(), 
+                            &self.key_var_value.to_string(),
+                            &self.iv_var_key.to_string(), 
+                            &self.iv_var_value.to_string()
+                        );
+                        skvf.write_all(&skvs.as_bytes());
+                    }
+                    //thread2
+                    {
+                        let sec_k_p = "secrets/travis-openssl-keys";
+                        let mut skf = fs::File::create(sec_k_p)?;
+                        let mut sks = std::format!("{},{}",
+                            &self.key_var_key.to_string(), 
+                            &self.iv_var_key.to_string(), 
+                        );
+                        skf.write_all(&sks.as_bytes());
+                    }
                 }
             },
             Err(e) => {
@@ -123,6 +136,7 @@ impl Travis {
                 }
             }, 
         }
+        Ok(())
     }
     
     fn add_openssl_cmd(&mut self) {
