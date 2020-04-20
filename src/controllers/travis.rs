@@ -1,9 +1,11 @@
+//for tar
 use flate2::write::GzEncoder;
 use flate2::write::GzDecoder;
 use flate2::Compression;
 use tar::Builder;
 use tar::Archive;
 
+//for files
 use std::env;
 use std::fs;
 use std::fs::File;
@@ -92,7 +94,6 @@ impl Travis {
                                     self.iv_var_key = s.to_string()
                                 }
                             }
-                            
                         } else if x.contains("key:") {
                             self.key_var_value = x.trim_start_matches("key: ")
                                                   .trim_start()
@@ -114,6 +115,12 @@ impl Travis {
                             &self.iv_var_value.to_string()
                         );
                         skvf.write_all(&skvs.as_bytes());
+                        env::set_var(
+                            &self.key_var_key.to_string(), 
+                            &self.key_var_value.to_string());
+                        env::set_var(
+                            &self.iv_var_key.to_string(), 
+                            &self.iv_var_value.to_string());
                     }
                     //thread2
                     {
@@ -160,7 +167,54 @@ impl Travis {
     fn decrypt_tar_secrets(&mut self) {
         if Path::new("secrets.tar.gz").exists() == true {
             let _ = fs::remove_file("secrets.tar.gz");
-            println!("deleted secrets.tar.gz")
+            println!("deleted secrets.tar.gz");
+        }
+        // get decrypt values from injected env (used for ci)
+        {
+            // get keys from file
+            let f = fs::read_to_string("secrets/travis-openssl-keys");
+            for s in f.unwrap().lines() { 
+                let d: Vec<_> = s.split(",").collect();
+                self.key_var_key = d[0].to_string();
+                self.iv_var_key = d[1].to_string();
+
+            }
+            // get values from env
+            match env::var_os(&self.key_var_key) {
+                Some(val) => {
+                    self.key_var_value = val.into_string().unwrap();
+                },
+                None => println!(
+                    "{} is not defined in the environment.", 
+                    &self.key_var_key
+                )
+            }
+            match env::var_os(&self.iv_var_key) {
+                Some(val) => {
+                    self.iv_var_value = val.into_string().unwrap();
+                },
+                None => println!(
+                    "{} is not defined in the environment.", 
+                    &self.iv_var_key
+                )
+            }
+        }
+
+        // get decrypt values from file (used for apps)
+        {
+            if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
+                let f = fs::read_to_string("secrets/travis-openssl-keys-values.txt");
+                for s in f.unwrap().lines() { 
+                    let d: Vec<_> = s.split("=").collect();
+                    if d[0].contains("_key") {
+                        self.key_var_key = d[0].to_string();
+                        self.key_var_value = d[1].to_string();
+                    } else if d[0].contains("_iv") {
+                        self.iv_var_key = d[0].to_string();
+                        self.iv_var_value = d[1].to_string();
+                    }
+                }
+            }
         }
 
         let e = "secrets.tar.gz.enc";

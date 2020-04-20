@@ -1,5 +1,4 @@
 /target
-secrets/*
 secrets.tar.gz
 secrets/*.json
 secrets/*.txt
