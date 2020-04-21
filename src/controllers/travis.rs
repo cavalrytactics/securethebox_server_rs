@@ -309,13 +309,12 @@ pub fn tar_decompress_secrets_directory() -> bool {
                 println!("tar decompressed");
                 true
             } else {
-                println!("error");
+                println!("error: tar_decompress_secrets_directory");
                 false
             }
         }
         Err(e) => {
             if let NotFound = e.kind() {
-                println!("`travis` was not found! Check your PATH!");
                 println!("If you see this in Travis-CI, safe to ignore");
                 true
             } else {
@@ -365,29 +364,22 @@ pub fn decrypt_tar_secrets() -> bool {
     let _ = c.tar_decompress_secrets_directory();
     match Command::new("travis").stdout(Stdio::null()).spawn() {
         Ok(_) => {
-            if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true &&
-                Path::new("secrets.tar.gz").exists() == true 
-            {
+            if Path::new("secrets.tar.gz").exists() == true {
                 println!("secrets tar is decrypted and decompressed");
-                println!("tar decompressed");
                 true
             } else {
-                println!("error");
+                println!("error, decrypt_tar_secrets");
                 false
             }
         }
         Err(e) => {
             if let NotFound = e.kind() {
-                println!("`travis` was not found! Check your PATH!");
                 println!("If you see this in Travis-CI, safe to ignore");
-                if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true &&
-                    Path::new("secrets.tar.gz").exists() == true 
-                {
+                if Path::new("secrets.tar.gz").exists() == true {
                     println!("secrets tar is decrypted and decompressed");
-                    println!("tar decompressed");
                     true
                 } else {
-                    println!("error");
+                    println!("error,decrypt_tar_secrets");
                     false
                 }
             } else {
