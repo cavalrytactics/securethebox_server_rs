@@ -1,8 +1,6 @@
 ---
 dist: bionic
 jobs:
-  allow_failures:
-    - rust: beta nightly
   fast_finish: true
   include:
     before_install:
@@ -11,6 +9,7 @@ jobs:
       - sudo apt-get update -y
       - sudo apt-get install google-cloud-sdk -y
       - sudo apt-get install kubectl -y
+      - openssl aes-256-cbc -K $encrypted_cdc0677920ab_key -iv $encrypted_cdc0677920ab_iv -in secrets.tar.gz.enc -out secrets.tar.gz -d
     cache: cargo
     env:
       global: CLOUDSDK_CORE_DISABLE_PROMPTS=1 CLOUDSDK_INSTALL_DIR=$HOME/google-cloud-sdk
@@ -24,6 +23,4 @@ jobs:
 language: rust
 rust:
   - stable
-  - beta
-  - nightly
 services: docker

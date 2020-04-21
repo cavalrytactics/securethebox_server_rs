@@ -1,8 +1,6 @@
 ---
 dist: bionic
 jobs:
-  allow_failures:
-    - rust: beta nightly
   fast_finish: true
   include:
     before_install:
@@ -22,8 +20,4 @@ jobs:
       - cargo build --verbose --all
       - cargo test --verbose --all
 language: rust
-rust:
-  - stable
-  - beta
-  - nightly
 services: docker

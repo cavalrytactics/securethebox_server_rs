@@ -141,7 +141,6 @@ impl Travis {
             }
         }
     }
-   
     //add decrypt command to .tarvis.yml
     fn add_openssl_cmd(&mut self) {
         let ty = ".travis.yml".to_string();
@@ -163,19 +162,70 @@ impl Travis {
 
     fn decrypt_tar_secrets(&mut self) {
         let s = "secrets.tar.gz.enc";
-        let output = Command::new("travis")
-            .arg("encrypt-file")
-            .arg("-d")
-            .arg("--key")
-            .arg(&self.key_var_value)
-            .arg("--iv")
-            .arg(&self.iv_var_value)
-            .arg("--force")
-            .arg(s)
-            .output()
-            .expect("openssl command failed to start");
-        if output.status.success() == true {
-            println!("Unencrypted file!")
+        let o = "secrets.tar.gz";
+        match Command::new("travis").stdout(Stdio::null()).spawn() {
+            Ok(_) => {
+                let output = Command::new("travis")
+                    .arg("encrypt-file")
+                    .arg("-d")
+                    .arg("--key")
+                    .arg(&self.key_var_value)
+                    .arg("--iv")
+                    .arg(&self.iv_var_value)
+                    .arg("--force")
+                    .arg(s)
+                    .output()
+                    .expect("openssl command failed to start");
+                if output.status.success() == true {
+                    println!("Unencrypted file!")
+                }
+            }
+            Err(e) => {
+                if let NotFound = e.kind() {
+                    println!("`travis` was not found! Check your PATH!");
+                    println!("If you see this in Travis-CI, safe to ignore");
+                    let f = fs::read_to_string(".travis-openssl-keys");
+                    for s in f.unwrap().lines() {
+                        let d: Vec<_> = s.split(",").collect();
+                        self.key_var_key = d[0].to_string();
+                        self.iv_var_key = d[1].to_string();
+                    }
+                    if env::var_os(&self.key_var_key) != None {
+                        match env::var_os(&self.key_var_key) {
+                            Some(val) => {
+                                self.key_var_value = val.into_string().unwrap();
+                            }
+                            None => println!("{} is not defined in the environment.", &self.key_var_key),
+                        }
+                    }
+                    if env::var_os(&self.iv_var_key) != None {
+                        match env::var_os(&self.iv_var_key) {
+                            Some(val) => {
+                                self.iv_var_value = val.into_string().unwrap();
+                            }
+                            None => println!("{} is not defined in the environment.", &self.iv_var_key),
+                        }
+                    }
+                    let output = Command::new("openssl")
+                        .arg("aes-256-cbc")
+                        .arg("-K")
+                        .arg(&self.key_var_value)
+                        .arg("-iv")
+                        .arg(&self.iv_var_value)
+                        .arg("-in")
+                        .arg(s)
+                        .arg("-out")
+                        .arg(o)
+                        .arg("-d")
+                        .output()
+                        .expect("openssl command failed to start");
+                    if output.status.success() == true {
+                        println!("Unencrypted file!")
+                    }
+                } else {
+                    println!("Some strange error occurred :(");
+                }
+            }
         }
     }
 }
@@ -253,12 +303,26 @@ pub fn tar_decompress_secrets_directory() -> bool {
     c.set_current_directory();
     let _ = c.tar_compress_secrets_directory();
     let _ = c.tar_decompress_secrets_directory();
-    if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
-        println!("tar decompressed");
-        true
-    } else {
-        println!("error");
-        false
+    match Command::new("travis").stdout(Stdio::null()).spawn() {
+        Ok(_) => {
+            if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
+                println!("tar decompressed");
+                true
+            } else {
+                println!("error");
+                false
+            }
+        }
+        Err(e) => {
+            if let NotFound = e.kind() {
+                println!("`travis` was not found! Check your PATH!");
+                println!("If you see this in Travis-CI, safe to ignore");
+                true
+            } else {
+                println!("Some strange error occurred :(");
+                false
+            }
+        }
     }
 }
 
