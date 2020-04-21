@@ -4,6 +4,7 @@ use flate2::Compression;
 use std::env;
 use std::fs;
 use std::fs::File;
+use std::io::prelude::*;
 use std::io::Error;
 use std::io::ErrorKind::NotFound;
 use std::path::{Path, PathBuf};
@@ -80,7 +81,6 @@ impl Travis {
                     }
                 }
             } else {
-                //if does not exist, set k
                 let f = fs::read_to_string(".travis-openssl-keys");
                 for s in f.unwrap().lines() {
                     let d: Vec<_> = s.split(",").collect();
@@ -90,7 +90,6 @@ impl Travis {
             }
         }
         {
-            //it env k exists, get v
             if env::var_os(&self.key_var_key) != None {
                 match env::var_os(&self.key_var_key) {
                     Some(val) => {
@@ -108,7 +107,7 @@ impl Travis {
                 }
             }
         }
-        //if travis binary exists, start encrypt
+        //if travis binary exists
         match Command::new("travis").stdout(Stdio::null()).spawn() {
             Ok(_) => {
                 //encrypt with set kv
@@ -122,18 +121,18 @@ impl Travis {
                     .arg(s)
                     .output()
                     .expect("travis command failed to start");
+                let output_utf = String::from_utf8_lossy(&output.stdout);
                 if output.status.success() == true {
-                    self.decrypt_cmd = format!(
-                        "openssl aes-256-cbc -K {} -iv {} -in secrets.tar.gz.enc -out secrets.tar.gz -d", 
-                        &self.key_var_key, &self.iv_var_key
-                    );
+                    println!("Encrypted file!");
+                    self.decrypt_cmd = format!("openssl aes-256-cbc -K {} -iv {} -in secrets.tar.gz.enc -out secrets.tar.gz -d", &self.key_var_key, &self.iv_var_key);
+                    println!("{}",&self.decrypt_cmd);
                 }
                 Ok(())
             }
             Err(e) => {
                 if let NotFound = e.kind() {
                     println!("`travis` was not found! Check your PATH!");
-                    println!("If you see this in Travis-CI, safe to ignore");
+                    println!("If you see this in Travis-CI, ignore");
                 } else {
                     println!("Some strange error occurred :(");
                 }
@@ -141,8 +140,109 @@ impl Travis {
             }
         }
     }
-   
-    //add decrypt command to .tarvis.yml
+    // fn encrypt_tar_secrets_old(&mut self) -> Result<(), Error> {
+    //     let s = "secrets.tar.gz";
+    //     // only execute if values not set (we want to prevent values changing)
+    //     if Path::new("secrets/travis-openssl-keys-values.txt").exists() == false {
+    //         println!("secrets/travis-openssl-keys-values.txt, does not exists");
+    //         // if travis binary not installed, install it (except ci)
+    //         match Command::new("travis").stdout(Stdio::null()).spawn() {
+    //             Ok(_) => {
+    //                 let output = Command::new("travis")
+    //                     .arg("encrypt-file")
+    //                     .arg("-f")
+    //                     .arg("-p")
+    //                     .arg(s)
+    //                     .output()
+    //                     .expect("travis command failed to start");
+    //                 let output_utf = String::from_utf8_lossy(&output.stdout);
+    //                 if output.status.success() == true {
+    //                     for x in output_utf.lines() {
+    //                         if x.contains("openssl aes-256-cbc") {
+    //                             self.decrypt_cmd = x.to_string();
+    //                             for s in self.decrypt_cmd.split_whitespace() {
+    //                                 if s.contains("_key") {
+    //                                     self.key_var_key = s.to_string();
+    //                                 } else if s.contains("_iv") {
+    //                                     self.iv_var_key = s.to_string()
+    //                                 }
+    //                             }
+    //                         } else if x.contains("key:") {
+    //                             self.key_var_value =
+    //                                 x.trim_start_matches("key: ").trim_start().to_string();
+    //                         } else if x.contains("iv:") {
+    //                             self.iv_var_value =
+    //                                 x.trim_start_matches("iv: ").trim_start().to_string();
+    //                         }
+    //                     }
+    //                     //thread1
+    //                     //write openssl keys to file and env
+    //                     {
+    //                         let sec_kv_p = "secrets/travis-openssl-keys-values.txt";
+    //                         let mut skvf = fs::File::create(sec_kv_p)?;
+    //                         let skvs = std::format!(
+    //                             "{}={}\n{}={}",
+    //                             &self.key_var_key.to_string(),
+    //                             &self.key_var_value.to_string(),
+    //                             &self.iv_var_key.to_string(),
+    //                             &self.iv_var_value.to_string()
+    //                         );
+    //                         let _ = skvf.write_all(&skvs.as_bytes());
+    //                         env::set_var(
+    //                             &self.key_var_key.to_string(),
+    //                             &self.key_var_value.to_string(),
+    //                         );
+    //                         env::set_var(
+    //                             &self.iv_var_key.to_string(),
+    //                             &self.iv_var_value.to_string(),
+    //                         );
+    //                     }
+    //                     //thread2
+    //                     //write keys to file for referencing env
+    //                     {
+    //                         let sec_k_p = ".travis-openssl-keys";
+    //                         let mut skf = fs::File::create(sec_k_p)?;
+    //                         let sks = std::format!(
+    //                             "{},{}",
+    //                             &self.key_var_key.to_string(),
+    //                             &self.iv_var_key.to_string(),
+    //                         );
+    //                         let _ = skf.write_all(&sks.as_bytes());
+    //                     }
+    //                 }
+    //             }
+    //             Err(e) => {
+    //                 if let NotFound = e.kind() {
+    //                     println!("`travis` was not found! Check your PATH!");
+    //                     println!("If you see this in Travis-CI, ignore");
+    //                 } else {
+    //                     println!("Some strange error occurred :(");
+    //                 }
+    //             }
+    //         }
+    //         Ok(())
+    //     } else {
+    //         println!("secrets/travis-openssl-keys-values.txt, exists...");
+    //         // Encrypt using existing variableso
+    //         // get decrypt values from file (used for apps)
+    //         {
+    //             if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
+    //                 let f = fs::read_to_string("secrets/travis-openssl-keys-values.txt");
+    //                 for s in f.unwrap().lines() {
+    //                     let d: Vec<_> = s.split("=").collect();
+    //                     if d[0].contains("_key") {
+    //                         self.key_var_key = d[0].to_string();
+    //                         self.key_var_value = d[1].to_string();
+    //                     } else if d[0].contains("_iv") {
+    //                         self.iv_var_key = d[0].to_string();
+    //                         self.iv_var_value = d[1].to_string();
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         Ok(())
+    //     }
+    // }
     fn add_openssl_cmd(&mut self) {
         let ty = ".travis.yml".to_string();
         let f = fs::read_to_string(".travis.yml");
@@ -163,6 +263,7 @@ impl Travis {
 
     fn decrypt_tar_secrets(&mut self) {
         let s = "secrets.tar.gz.enc";
+        let o = "secrets.tar.gz";
         let output = Command::new("travis")
             .arg("encrypt-file")
             .arg("-d")
@@ -174,10 +275,78 @@ impl Travis {
             .arg(s)
             .output()
             .expect("openssl command failed to start");
+        let output_utf = String::from_utf8_lossy(&output.stdout);
         if output.status.success() == true {
             println!("Unencrypted file!")
         }
     }
+    // fn decrypt_tar_secrets_old(&mut self) {
+    //     {
+    //         if Path::new("secrets.tar.gz").exists() == true {
+    //             let _ = fs::remove_file("secrets.tar.gz");
+    //             println!("deleted secrets.tar.gz");
+    //         }
+    //     }
+    //     // get decrypt values from injected env (used for ci)
+    //     {
+    //         // get keys from file
+    //         let f = fs::read_to_string(".travis-openssl-keys");
+    //         for s in f.unwrap().lines() {
+    //             let d: Vec<_> = s.split(",").collect();
+    //             self.key_var_key = d[0].to_string();
+    //             self.iv_var_key = d[1].to_string();
+    //         }
+    //         // get values from env
+    //         match env::var_os(&self.key_var_key) {
+    //             Some(val) => {
+    //                 self.key_var_value = val.into_string().unwrap();
+    //             }
+    //             None => println!("{} is not defined in the environment.", &self.key_var_key),
+    //         }
+    //         match env::var_os(&self.iv_var_key) {
+    //             Some(val) => {
+    //                 self.iv_var_value = val.into_string().unwrap();
+    //             }
+    //             None => println!("{} is not defined in the environment.", &self.iv_var_key),
+    //         }
+    //     }
+
+    //     // get decrypt values from file (used for apps)
+    //     {
+    //         if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
+    //             let f = fs::read_to_string("secrets/travis-openssl-keys-values.txt");
+    //             for s in f.unwrap().lines() {
+    //                 let d: Vec<_> = s.split("=").collect();
+    //                 if d[0].contains("_key") {
+    //                     self.key_var_key = d[0].to_string();
+    //                     self.key_var_value = d[1].to_string();
+    //                 } else if d[0].contains("_iv") {
+    //                     self.iv_var_key = d[0].to_string();
+    //                     self.iv_var_value = d[1].to_string();
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     let e = "secrets.tar.gz.enc";
+    //     let u = "secrets.tar.gz";
+    //     let _ = Command::new("openssl")
+    //         .arg("aes-256-cbc")
+    //         .arg("-K")
+    //         .arg(&self.key_var_value)
+    //         .arg("-iv")
+    //         .arg(&self.iv_var_value)
+    //         .arg("-in")
+    //         .arg(e)
+    //         .arg("-out")
+    //         .arg(u)
+    //         .arg("-d")
+    //         .output()
+    //         .expect("travis command failed to start");
+    //     if Path::new("secrets.tar.gz").exists() == true {
+    //         println!("secrets.tar.gz exists")
+    //     }
+    // }
 }
 //public functions should be STATELESS
 //add all the necessary sub functions
@@ -273,8 +442,8 @@ pub fn encrypt_tar_secrets() -> bool {
         iv_var_value: String::new(),
     };
     c.set_current_directory();
-    let _ = c.encrypt_tar_secrets();
-    c.add_openssl_cmd();
+    c.encrypt_tar_secrets();
+    // c.add_openssl_cmd();
     if Path::new("secrets.tar.gz.enc").exists() == true {
         println!("secrets tar is encrypted");
         true
@@ -300,7 +469,7 @@ pub fn decrypt_tar_secrets() -> bool {
     c.decrypt_tar_secrets();
     let _ = c.tar_decompress_secrets_directory();
     if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
-        println!("secrets tar is decrypted and decompressed");
+        println!("secrets tar is decrypted");
         true
     } else {
         false
