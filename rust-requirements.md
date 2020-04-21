@@ -1,14 +1,14 @@
 # Planning
-TL;DR - Rust GraphQL subscriptions not stable
-
 - Docker Image
   [RUST]
+    - Rust
+      - https://hub.docker.com/_/rust
     - Graphql
       - https://github.com/jayy-lmao/rust-graphql-docker
     - Web
-      - https://github.com/actix/examples
+      - https://github.com/seanmonstar/warp
     - Authentication
-      - https://github.com/emreyalvac/actix-web-jwt/
+      - Google Outh2
 
 - HTTP service
   [RUST]
