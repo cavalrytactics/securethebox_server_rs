@@ -6,6 +6,7 @@
 
 ## Requirements
 - [travis-ci cli: latest](https://github.com/travis-ci/travis.rb#mac-os-x-via-homebrew)
+- [docker desktop for mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac/)
 - [terraform cli: v12.24](https://www.terraform.io/downloads.html)
 - [Rust](https://www.rust-lang.org/tools/install)
 

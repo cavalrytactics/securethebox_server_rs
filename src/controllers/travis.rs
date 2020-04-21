@@ -50,23 +50,16 @@ impl Travis {
         let s = "secrets.tar.gz";
         let p = "secrets";
 
-        if Path::new(s).exists() == true {
-            println!("s exists");
+        if Path::new(p).exists() == false {
+            println!("{} folder does not exist", p.to_string());
             let tar_gz = File::open(s)?;  
             let tar = GzDecoder::new(tar_gz);
             let mut archive = Archive::new(tar);
-            println!("archive created");
-
-            if Path::new(p).exists() == true {
-                println!("secrets path exist");
-                Ok(())
-            } else {
-                println!("tar unpacked {:?}",archive.unpack(".").unwrap());
-                archive.unpack(".")?;
-                Ok(())
-            }
+            archive.unpack(".")?;
+            println!("unpacked archive!!!");
+            Ok(())
         } else {
-            println!("error....");
+            println!("{} exists... to not need go decompress",p);
             Ok(())
         }
     }
