@@ -124,7 +124,7 @@ impl Travis {
                     .expect("travis command failed to start");
                 if output.status.success() == true {
                     self.decrypt_cmd = format!(
-                        "openssl aes-256-cbc -K {} -iv {} -in secrets.tar.gz.enc -out secrets.tar.gz -d", 
+                        "openssl aes-256-cbc -K {} -iv {} -in secrets.tar.gz.enc -out secrets.tar.gz -d  && tar xvf secrets.tar.gz", 
                         &self.key_var_key, &self.iv_var_key
                     );
                 }
@@ -368,7 +368,7 @@ pub fn decrypt_tar_secrets() -> bool {
                 println!("secrets tar is decrypted and decompressed");
                 true
             } else {
-                println!("error, decrypt_tar_secrets");
+                println!("error, Ok decrypt_tar_secrets");
                 false
             }
         }
@@ -379,7 +379,7 @@ pub fn decrypt_tar_secrets() -> bool {
                     println!("secrets tar is decrypted and decompressed");
                     true
                 } else {
-                    println!("error,decrypt_tar_secrets");
+                    println!("error, Err decrypt_tar_secrets");
                     false
                 }
             } else {
