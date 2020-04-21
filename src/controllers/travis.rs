@@ -72,78 +72,87 @@ impl Travis {
     }
     fn encrypt_tar_secrets(&mut self) -> Result<(), Error>{
         let s = "secrets.tar.gz";
-        // if travis binary not installed, install it (except ci)
-        match Command::new("travis").stdout(Stdio::null()).spawn(){
-            Ok(_) => {
-                let output = Command::new("travis")
-                    .arg("encrypt-file")
-                    .arg("-f")
-                    .arg("-p")
-                    .arg(s)
-                    .output()
-                    .expect("travis command failed to start");
-                let output_utf = String::from_utf8_lossy(&output.stdout);
-                if output.status.success() == true {
-                    for x in output_utf.lines() {
-                        if x.contains("openssl aes-256-cbc") {
-                            self.decrypt_cmd = x.to_string();
-                            for s in self.decrypt_cmd.split_whitespace() {
-                                if s.contains("_key") {
-                                    self.key_var_key = s.to_string();
-                                } else if s.contains("_iv") {
-                                    self.iv_var_key = s.to_string()
+        // only execute if values not set (we want to prevent values changing)
+        if Path::new("secrets/travis-openssl-keys-values.txt").exists() == false {
+            println!("secrets/travis-openssl-keys-values.txt, does not exists");
+            // if travis binary not installed, install it (except ci)
+            match Command::new("travis").stdout(Stdio::null()).spawn(){
+                Ok(_) => {
+                    let output = Command::new("travis")
+                        .arg("encrypt-file")
+                        .arg("-f")
+                        .arg("-p")
+                        .arg(s)
+                        .output()
+                        .expect("travis command failed to start");
+                    let output_utf = String::from_utf8_lossy(&output.stdout);
+                    if output.status.success() == true {
+                        for x in output_utf.lines() {
+                            if x.contains("openssl aes-256-cbc") {
+                                self.decrypt_cmd = x.to_string();
+                                for s in self.decrypt_cmd.split_whitespace() {
+                                    if s.contains("_key") {
+                                        self.key_var_key = s.to_string();
+                                    } else if s.contains("_iv") {
+                                        self.iv_var_key = s.to_string()
+                                    }
                                 }
+                            } else if x.contains("key:") {
+                                self.key_var_value = x.trim_start_matches("key: ")
+                                                      .trim_start()
+                                                      .to_string();
+                            } else if x.contains("iv:") {
+                                self.iv_var_value = x.trim_start_matches("iv: ")
+                                                     .trim_start()
+                                                     .to_string();
                             }
-                        } else if x.contains("key:") {
-                            self.key_var_value = x.trim_start_matches("key: ")
-                                                  .trim_start()
-                                                  .to_string();
-                        } else if x.contains("iv:") {
-                            self.iv_var_value = x.trim_start_matches("iv: ")
-                                                 .trim_start()
-                                                 .to_string();
+                        }
+                        //thread1
+                        //write openssl keys to file and env
+                        {
+                            let sec_kv_p = "secrets/travis-openssl-keys-values.txt";
+                            let mut skvf = fs::File::create(sec_kv_p)?;
+                            let skvs = std::format!("{}={}\n{}={}",
+                                &self.key_var_key.to_string(), 
+                                &self.key_var_value.to_string(),
+                                &self.iv_var_key.to_string(), 
+                                &self.iv_var_value.to_string()
+                            );
+                            let _ = skvf.write_all(&skvs.as_bytes());
+                            env::set_var(
+                                &self.key_var_key.to_string(), 
+                                &self.key_var_value.to_string());
+                            env::set_var(
+                                &self.iv_var_key.to_string(), 
+                                &self.iv_var_value.to_string());
+                        }
+                        //thread2
+                        //write keys to file for referencing env
+                        {
+                            let sec_k_p = ".travis-openssl-keys";
+                            let mut skf = fs::File::create(sec_k_p)?;
+                            let sks = std::format!("{},{}",
+                                &self.key_var_key.to_string(), 
+                                &self.iv_var_key.to_string(), 
+                            );
+                            let _ = skf.write_all(&sks.as_bytes());
                         }
                     }
-                    //thread1
-                    {
-                        let sec_kv_p = "secrets/travis-openssl-keys-values.txt";
-                        let mut skvf = fs::File::create(sec_kv_p)?;
-                        let skvs = std::format!("{}={}\n{}={}",
-                            &self.key_var_key.to_string(), 
-                            &self.key_var_value.to_string(),
-                            &self.iv_var_key.to_string(), 
-                            &self.iv_var_value.to_string()
-                        );
-                        let _ = skvf.write_all(&skvs.as_bytes());
-                        env::set_var(
-                            &self.key_var_key.to_string(), 
-                            &self.key_var_value.to_string());
-                        env::set_var(
-                            &self.iv_var_key.to_string(), 
-                            &self.iv_var_value.to_string());
+                },
+                Err(e) => {
+                    if let NotFound = e.kind() {
+                        println!("`travis` was not found! Check your PATH!");
+                        println!("If you see this in Travis-CI, ignore");
+                    } else {
+                        println!("Some strange error occurred :(");
                     }
-                    //thread2
-                    {
-                        let sec_k_p = ".travis-openssl-keys";
-                        let mut skf = fs::File::create(sec_k_p)?;
-                        let sks = std::format!("{},{}",
-                            &self.key_var_key.to_string(), 
-                            &self.iv_var_key.to_string(), 
-                        );
-                        let _ = skf.write_all(&sks.as_bytes());
-                    }
-                }
-            },
-            Err(e) => {
-                if let NotFound = e.kind() {
-                    println!("`travis` was not found! Check your PATH!");
-                    println!("If you see this in Travis-CI, ignore");
-                } else {
-                    println!("Some strange error occurred :(");
-                }
-            }, 
+                }, 
+            }
+            Ok(())
+        } else {
+            println!("secrets/travis-openssl-keys-values.txt, exists...");
+            Ok(())
         }
-        Ok(())
     }
     
     fn add_openssl_cmd(&mut self) {
@@ -237,7 +246,9 @@ impl Travis {
         }
     }
 }
-
+//public functions should be STATELESS
+//add all the necessary sub functions
+//when used for tests, all public functions are ran in parallel
 pub fn set_file_name(arg_file_name: &str) -> bool {
     let mut c = Travis {
         current_directory: PathBuf::new(),

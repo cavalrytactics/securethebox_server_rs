@@ -1,6 +1,12 @@
 # securethebox_server_rs
+## Overview
+- 
+- web framework: [warp](https://github.com/seanmonstar/warp)
+  - supports juniper/graphql
+
 ## Requirements
-- [travis-ci cli](https://github.com/travis-ci/travis.rb#mac-os-x-via-homebrew)
+- [travis-ci cli: latest](https://github.com/travis-ci/travis.rb#mac-os-x-via-homebrew)
+- [terraform cli: v12.24](https://www.terraform.io/downloads.html)
 - [Rust](https://www.rust-lang.org/tools/install)
 
 - Building

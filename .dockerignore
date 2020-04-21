@@ -1,0 +1,11 @@
+# SECURETHEBOX
+.git
+.gitignore
+.vscode/
+secrets/*.json
+secrets/*.txt
+secrets/*.yaml
+secrets/*.yml
+secrets/*.tar
+.DS_Store
+/target
