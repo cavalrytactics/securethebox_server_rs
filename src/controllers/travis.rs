@@ -113,13 +113,8 @@ impl Travis {
             Ok(_) => {
                 //encrypt with set kv
                 let output = Command::new("travis")
-                    .arg("encrypt-file")
-                    .arg("--key")
-                    .arg(&self.key_var_value)
-                    .arg("--iv")
-                    .arg(&self.iv_var_value)
-                    .arg("--force")
-                    .arg(s)
+                    .args(&["encrypt-file", "--key", &self.key_var_value, 
+                            "--iv", &self.iv_var_value, "--force", s])
                     .output()
                     .expect("travis command failed to start");
                 if output.status.success() == true {
@@ -166,14 +161,8 @@ impl Travis {
         match Command::new("travis").stdout(Stdio::null()).spawn() {
             Ok(_) => {
                 let output = Command::new("travis")
-                    .arg("encrypt-file")
-                    .arg("-d")
-                    .arg("--key")
-                    .arg(&self.key_var_value)
-                    .arg("--iv")
-                    .arg(&self.iv_var_value)
-                    .arg("--force")
-                    .arg(s)
+                    .args(&["encrypt-file", "-d", "--key", &self.key_var_value, 
+                            "--iv", &self.iv_var_value, "--force", s])
                     .output()
                     .expect("openssl command failed to start");
                 if output.status.success() == true {
@@ -207,16 +196,9 @@ impl Travis {
                         }
                     }
                     let output = Command::new("openssl")
-                        .arg("aes-256-cbc")
-                        .arg("-K")
-                        .arg(&self.key_var_value)
-                        .arg("-iv")
-                        .arg(&self.iv_var_value)
-                        .arg("-in")
-                        .arg(s)
-                        .arg("-out")
-                        .arg(o)
-                        .arg("-d")
+                        .args(&[ "aes-256-cbc", "-K", &self.key_var_value, 
+                                "-iv", &self.iv_var_value, "-in", s, 
+                                "-out", o, "-d"])
                         .output()
                         .expect("openssl command failed to start");
                     if output.status.success() == true {

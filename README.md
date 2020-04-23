@@ -1,33 +1,40 @@
 # securethebox_server_rs
 ## Overview
-- 
+- frontend framework: [yew](https://github.com/yewstack/yew/)
 - web framework: [warp](https://github.com/seanmonstar/warp)
-  - supports juniper/graphql
+- graphql service: [juniper](https://github.com/graphql-rust/juniper)
+- database service: [mongodb atlas](https://github.com/mongodb/mongo-rust-driver)
 
-## Requirements
+## Requirements for local dev
 - [travis-ci cli: latest](https://github.com/travis-ci/travis.rb#mac-os-x-via-homebrew)
 - [docker desktop for mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac/)
 - [terraform cli: v12.24](https://www.terraform.io/downloads.html)
-- [Rust](https://www.rust-lang.org/tools/install)
+- [gcloud sdk cli](https://cloud.google.com/sdk/docs/downloads-interactive)
+- [rust](https://www.rust-lang.org/tools/install)
 
-- Building
+## Building
 ```
 cargo build
 ```
-- Running
+## Running
 ```
 cargo run
 ```
-- Testing
+## Testing
+- test default
 ```
-cargo test
+cargo test -- --ignored
+```
+- test include ignored
+```
+cargo test -- --ignored
 ```
 
-- Recommended Cargo Tools
+## Recommended Cargo Tools
 - [cargo-watch](https://github.com/passcod/cargo-watch)
 - [cargo-outdated](https://github.com/kbknapp/cargo-outdated)
 
-- Recommended Aliases
+## Recommended Aliases
 ```
 alias cb="cargo build"
 alias cbr="cargo build --release"
@@ -40,7 +47,7 @@ ure'"
 alias cwr="cargo-watch  -i .travis-openssl-keys -i secrets/travis-openssl-keys-values.txt -i test.rs -i test.yml -i .travis.yml -i target/* -i secrets.tar.gz -i secrets.tar.gz.enc -i -x run"
 ```
 
-- Recommended Terminal Split
+## Recommended Terminal Split
 ```
 mainTerm:
 cwr

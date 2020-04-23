@@ -1,0 +1,3 @@
+[submodule "src/securethebox_terraform"]
+	path = src/securethebox_terraform
+	url = https://github.com/cavalrytactics/securethebox_terraform.git
