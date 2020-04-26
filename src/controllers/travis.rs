@@ -22,7 +22,7 @@ pub struct Travis {
 }
 
 impl Travis {
-    fn set_file_name(&mut self, file_name: &str) {
+    fn set_file_name(&mut self, file_name: &String) {
         self.file_name = file_name.to_string();
     }
     fn set_current_directory(&mut self) {
@@ -58,13 +58,14 @@ impl Travis {
             println!("unpacked archive!!!");
             Ok(())
         } else {
-            println!("{} exists... to not need go decompress", p);
+            println!("{} exists... do not need go decompress", p);
             Ok(())
         }
     }
 
     fn encrypt_tar_secrets(&mut self) -> Result<(), Error> {
         let s = "secrets.tar.gz";
+        // create a scope
         {
             //if secrets exist, set kv
             if Path::new("secrets/travis-openssl-keys-values.txt").exists() == true {
@@ -88,7 +89,8 @@ impl Travis {
                     self.iv_var_key = d[1].to_string();
                 }
             }
-        }
+        } // <-- borrow ends here
+        // create a scope
         {
             //it env k exists, get v
             if env::var_os(&self.key_var_key) != None {
@@ -107,17 +109,17 @@ impl Travis {
                     None => println!("{} is not defined in the environment.", &self.iv_var_key),
                 }
             }
-        }
+        } // <-- borrow ends here
         //if travis binary exists, start encrypt
         match Command::new("travis").stdout(Stdio::null()).spawn() {
             Ok(_) => {
                 //encrypt with set kv
-                let output = Command::new("travis")
+                let _ = Command::new("travis")
                     .args(&["encrypt-file", "--key", &self.key_var_value, 
                             "--iv", &self.iv_var_value, "--force", s])
                     .output()
                     .expect("travis command failed to start");
-                if output.status.success() == true {
+                if &self.key_var_key != "" && &self.iv_var_key != "" {
                     self.decrypt_cmd = format!(
                         "openssl aes-256-cbc -K {} -iv {} -in secrets.tar.gz.enc -out secrets.tar.gz -d  && tar xvf secrets.tar.gz", 
                         &self.key_var_key, &self.iv_var_key
@@ -139,7 +141,7 @@ impl Travis {
     //add decrypt command to .tarvis.yml
     fn add_openssl_cmd(&mut self) {
         let ty = ".travis.yml".to_string();
-        let f = fs::read_to_string(".travis.yml");
+        let f = fs::read_to_string(".travis_template.yml");
         let v: serde_json::Value = serde_yaml::from_str(&f.unwrap()).unwrap();
         let mut j = serde_json::json!(&v);
         let bi = j["jobs"]["include"]["before_install"]
@@ -211,10 +213,11 @@ impl Travis {
         }
     }
 }
-//public functions should be STATELESS
-//add all the necessary sub functions
-//when used for tests, all public functions are ran in parallel
-pub fn set_file_name(arg_file_name: &str) -> bool {
+// public functions should be STATELESS
+// add all the necessary sub functions
+// when used for tests, all public functions are by default ran in parallel
+// https://doc.rust-lang.org/book/ch11-02-running-tests.html#running-tests-in-parallel-or-consecutively
+pub fn set_file_name(arg_file_name: String) -> bool {
     let mut c = Travis {
         current_directory: PathBuf::new(),
         file_name: String::new(),
@@ -224,7 +227,7 @@ pub fn set_file_name(arg_file_name: &str) -> bool {
         iv_var_key: String::new(),
         iv_var_value: String::new(),
     };
-    c.set_file_name(arg_file_name);
+    c.set_file_name(&arg_file_name);
     if c.file_name == arg_file_name {
         println!("file name: {}", c.file_name);
         true

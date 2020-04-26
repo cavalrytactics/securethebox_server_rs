@@ -9,3 +9,7 @@ secrets/*.yml
 secrets/*.tar
 .DS_Store
 /target
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfstate.d

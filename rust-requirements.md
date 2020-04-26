@@ -12,29 +12,20 @@
 
 - HTTP service
   [RUST]
-    - https://github.com/actix/actix-web
-      - CORS: https://github.com/actix/actix-web/tree/master/actix-cors
-  [TYPESCRIPT]
-    - https://github.com/denoland/deno
+
 - Testing Library
   [RUST]
     - native
       - https://doc.rust-lang.org/1.18.0/book/first-edition/testing.html
-  [TYPESCRIPT]
-    - https://github.com/chiragrupani/TSUnitTestsSetup
+
 - Types
   [RUST]
     - native
-  [TYPESCRIPT]
-    - native
+
 - Travis support
   [RUST]
     - https://docs.travis-ci.com/user/languages/rust/
-  [TYPESCRIPT]
-    - native
-    - 
-- Virtual Environment
-  [RUST]
+
 - GraphQL support
   [RUST]
     - https://github.com/graphql-rust/juniper
@@ -50,7 +41,7 @@
       - https://github.com/clux/kube-rs
 - Authentication
   [RUST]
-  [TYPESCRIPT]
+
 - Google Cloud Platform
   [RUST]
     - Cloud Run
@@ -69,3 +60,9 @@
 - Test cases
 - Version Control / Releases
 - Documentation - Data Flow - Action Diagrams
+
+# Layer of Rust
+1. mio = i/o to os
+2. futures & async-await = async/promises
+3. tokio = timers/scheduling
+4. tower & tonic & hyper = http client/server

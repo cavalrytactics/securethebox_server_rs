@@ -21,11 +21,15 @@ cargo build
 cargo run
 ```
 ## Testing
-- test default
+- test default (execution=1-thread) all tests should succeed
 ```
-cargo test -- --ignored
+cargo test -- --test-threads=1
 ```
-- test include ignored
+- test (excluds ignored tests), (execution=parallel) some tests may fail
+```
+cargo test
+```
+- test include ignored (high cpu tests)
 ```
 cargo test -- --ignored
 ```
@@ -41,10 +45,9 @@ alias cbr="cargo build --release"
 alias cr="cargo run"
 alias cc="cargo check"
 alias ct="cargo test"
-alias cwc="cargo-watch -i .travis-openssl-keys -i secrets/travis-openssl-keys-values.txt -i test.rs -i test.yml -i .travis.yml -i target/* -i secrets.tar.gz -i secrets.tar.gz.enc -i -x check"
-alias cwt="cargo-watch -i .travis-openssl-keys -i secrets/travis-openssl-keys-values.txt -i test.rs -i test.yml -i .travis.yml -i target/* -i secrets.tar.gz -i secrets.tar.gz.enc -i -x 'test -- --nocapt
-ure'"
-alias cwr="cargo-watch  -i .travis-openssl-keys -i secrets/travis-openssl-keys-values.txt -i test.rs -i test.yml -i .travis.yml -i target/* -i secrets.tar.gz -i secrets.tar.gz.enc -i -x run"
+alias cwc="cargo-watch -w src -x check"
+alias cwt="cargo-watch -w src -x 'test -- --nocapture --test-threads=1'"
+alias cwr="cargo-watch -w src -x run"
 ```
 
 ## Recommended Terminal Split

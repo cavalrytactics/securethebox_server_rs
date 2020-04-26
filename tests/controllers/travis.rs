@@ -5,7 +5,7 @@ use securethebox_server_rs::controllers::travis;
 
 #[test]
 fn test_set_file_name() {
-    assert_eq!(travis::set_file_name("test"), true);
+    assert_eq!(travis::set_file_name("test".to_string()), true);
 }
 
 #[test]
