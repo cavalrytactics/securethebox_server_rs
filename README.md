@@ -1,9 +1,9 @@
 # securethebox_server_rs
 ## Overview
-- frontend framework: [yew](https://github.com/yewstack/yew/)
-- web framework: [warp](https://github.com/seanmonstar/warp)
+- frontend framework: [yew](https://github.com/yewstack/yew)
+- web framework: [actix-web](https://github.com/actix/actix-web)
 - graphql service: [juniper](https://github.com/graphql-rust/juniper)
-- database service: [mongodb atlas](https://github.com/mongodb/mongo-rust-driver)
+- database service: [mongodb-rust-driver](https://github.com/mongodb/mongo-rust-driver)
 
 ## Requirements for local dev
 - [travis-ci cli: latest](https://github.com/travis-ci/travis.rb#mac-os-x-via-homebrew)
@@ -16,6 +16,15 @@
 ```
 cargo build
 ```
+## Database + Seeding
+```
+docker-compose up
+cargo run --bin seed
+```
+## Database purging
+```
+docker-compose down -v
+```
 ## Running
 ```
 cargo run
@@ -25,18 +34,24 @@ cargo run
 ```
 cargo test -- --test-threads=1
 ```
-- test (excluds ignored tests), (execution=parallel) some tests may fail
+- test (excludes ignored tests), (execution=parallel) some tests may fail
 ```
 cargo test
 ```
-- test include ignored (high cpu tests)
+- test include ignored (excludes high cpu/memory tests)
 ```
 cargo test -- --ignored
 ```
+## CI/CD
+- [securethebox_server_rs](https://travis-ci.org/github/cavalrytactics/securethebox_server_rs)
+- src/controllers/travis.rs
+- travis_template.yml <-- Edit
+- travis.yml <-- Do not edit
 
 ## Recommended Cargo Tools
 - [cargo-watch](https://github.com/passcod/cargo-watch)
 - [cargo-outdated](https://github.com/kbknapp/cargo-outdated)
+- DO NOT USE rust-clippy its very buggy
 
 ## Recommended Aliases
 ```
@@ -60,4 +75,7 @@ cwc
 
 term2:
 cwt
+
+term3:
+docker-compose up
 ```
