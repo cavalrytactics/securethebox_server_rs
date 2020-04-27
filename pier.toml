@@ -1,0 +1,55 @@
+[scripts.b]
+alias = 'b'
+command = 'cargo build'
+
+[scripts.r]
+alias = 'r'
+command = 'cargo run'
+
+[scripts.t]
+alias = 't'
+command = 'cargo test --no --nocapture --test-threads=1'
+
+[scripts.we]
+alias = 'we'
+command = 'cargo-watch -w espanso -s "espanso restart"'
+
+[scripts.wr]
+alias = 'wr'
+command = 'cargo-watch -w src -w tests -d 15 -x run'
+
+[scripts.wt]
+alias = 'wt'
+command = 'cargo-watch -w src -w tests -d 15 -x "test --no --nocapture --test-threads=1"'
+
+[scripts.du]
+alias = 'du'
+command = 'docker-compose up'
+
+[scripts.duu]
+alias = 'dud'
+command = 'docker-compose up -d'
+
+[scripts.dd]
+alias = 'wt'
+command = 'docker-compose down -v'
+
+[scripts.ee]
+alias = 'ee'
+command = 'espanso edit'
+
+[scripts.es]
+alias = 'es'
+command = 'espanso start'
+
+[scripts.er]
+alias = 'er'
+command = 'espanso restart'
+
+[scripts.esync]
+alias = 'eo'
+command = 'open https://espanso.org/docs/sync/'
+
+[scripts.mie]
+alias = 'mie'
+command = 'brew tap federico-terzi/espanso && brew install espanso'

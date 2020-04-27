@@ -1,0 +1,18 @@
+filter_exec: "/Applications/Visual Studio Code.app"
+# filter_class: "com.microsoft.VSCode"
+# fitler_title: "com.microsoft.VSCode"
+
+name: vscode
+prent: default
+
+matches:
+  # Simple text replacementvs
+  - trigger: "vs"
+    replace: "vscode"
+
+  - trigger: "trig"
+    replace: "trigger: \"$|$\""
+  
+  - trigger: "repl"
+    replace: "replace: \"$|$\""
+    

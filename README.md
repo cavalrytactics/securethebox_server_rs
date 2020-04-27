@@ -49,33 +49,37 @@ cargo test -- --ignored
 - travis.yml <-- Do not edit
 
 ## Recommended Cargo Tools
+- [Awesome Rust](https://github.com/rust-unofficial/awesome-rust#build-system)
 - [cargo-watch](https://github.com/passcod/cargo-watch)
 - [cargo-outdated](https://github.com/kbknapp/cargo-outdated)
+- [pier](https://github.com/pier-cli/pier)
+  - pier config is already in pier.toml file
 - DO NOT USE rust-clippy its very buggy
 
 ## Recommended Aliases
+- pier
 ```
-alias cb="cargo build"
-alias cbr="cargo build --release"
-alias cr="cargo run"
-alias cc="cargo check"
-alias ct="cargo test"
-alias cwc="cargo-watch -w src -x check"
-alias cwt="cargo-watch -w src -x 'test -- --nocapture --test-threads=1'"
-alias cwr="cargo-watch -w src -x run"
+alias p="pier run"
+alias pl="pier list"
+alias pg="pier list | grep "
 ```
 
 ## Recommended Terminal Split
 ```
-mainTerm:
-cwr
+mainTerm (cargo run watch):
+p wr
 
-term1:
-cwc
+term1 (cargo test watch):
+p wt
 
-term2:
-cwt
+term2 (espanso watch):
+p we
 
-term3:
-docker-compose up
+term3 (docker mongodb);
+p du
 ```
+
+## Rust Primatives
+- [STD Libraries](https://github.com/brson/stdx)
+- [DataTypes Cheatsheet](https://cheat.rs)
+- [Rust for Pros](https://overexact.com/rust-for-professionals/)

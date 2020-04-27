@@ -1,0 +1,85 @@
+# espanso configuration file
+# This is the default configuration file, change it as you like it
+# You can refer to the official documentation:
+# https://espanso.org/docs/
+# Matches are the substitution rules, when you type theessstrigger" string
+# it gets replaced by the "replace" string.
+matches:
+  # Simple text replacement
+  - trigger: "theis is a ter"
+    replace: "eesss"
+
+  - trigger: ":div"
+    replace: "<div>$|$</div>"
+  
+  # Multiple replace
+  - triggers: ["word1", "word2"]
+    replace: "world"
+
+  # Replace same character case  
+  - trigger: "alh"
+    replace: "although"
+    propagate_case: true
+    word: true
+
+  # Dates
+  - trigger: ":date"
+    replace: "{{mydate}}"
+    vars:
+      - name: mydate
+        type: date
+        params:
+          format: "%m/%d/%Y"
+  # Images        
+  - trigger: ":catimage"
+    image_path: "$CONFIG/images/cat.png"
+  # Shell commands
+  - trigger: ":shell"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: shell
+        params:
+          cmd: "echo Hello from your shell"
+  # Shell commands
+  - trigger: ":ip"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: shell
+        params:
+          cmd: "curl 'https://api.ipify.org'"
+  - trigger: ":localip"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: shell
+        params:
+          cmd: "ip a | grep 'inet 192' | awk '{ print $2 }'"
+  # Python commands
+  - trigger: ":pyscript"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: script
+        params:
+          args:
+            - python
+            - /path/to/your/script.py
+  # Random
+  - trigger: ":quote"
+    replace: "{{output}}"
+    vars:
+      - name: output
+        type: random
+        params:
+          choices:
+            - "Every moment is a fresh beginning."
+            - "Everything you can imagine is real."
+            - "Whatever you do, do it well."
+  # Clipboard
+  - trigger: ":a"
+    replace: "<a href='{{clipboard}}' />$|$</a>"
+    vars:
+      - name: "clipboard"
+        type: "clipboard"

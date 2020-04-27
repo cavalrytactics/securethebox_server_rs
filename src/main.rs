@@ -27,13 +27,21 @@ async fn main() -> io::Result<()> {
     });
 
     let gql = std::sync::Arc::new(create_schema());
-    // Start http server
+    // Start actix http server
     HttpServer::new(move || {
         App::new()
             .data(gql.clone())
             .data(db_clients.clone())
-            .wrap(DefaultHeaders::new().header("x-request-id", Uuid::new_v4().to_string()))
-            .wrap(Logger::new("IP:%a DATETIME:%t REQUEST:\"%r\" STATUS: %s DURATION:%D X-REQUEST-ID:%{x-request-id}o"))
+            .wrap(DefaultHeaders::new()
+            .header("x-request-id", Uuid::new_v4().to_string()))
+            .wrap(Logger::new("
+                IP:%a 
+                DATETIME:%t 
+                REQUEST:\"%r\" 
+                STATUS: %s 
+                DURATION:%D 
+                X-REQUEST-ID:%{x-request-id}o
+            "))
             .configure(app_routes)
     })
     .bind(format!("0.0.0.0:{}", port))?
