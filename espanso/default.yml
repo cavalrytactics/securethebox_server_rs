@@ -77,6 +77,18 @@ matches:
             - "Every moment is a fresh beginning."
             - "Everything you can imagine is real."
             - "Whatever you do, do it well."
+  # Multi-lines
+  - trigger: "include newlines"
+    replace: |
+              exactly as you see
+              will appear these three
+              lines of poetry
+  # Single line, folded        
+  - trigger: "fold newlines"
+    replace: >
+              this is really a
+              single line of text
+              despite appearances
   # Clipboard
   - trigger: ":a"
     replace: "<a href='{{clipboard}}' />$|$</a>"

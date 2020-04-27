@@ -1,0 +1,19 @@
+filter_exec: "/Applications/Visual Studio Code.app"
+# fitler_title: "com.microsoft.VSCode"
+# filter_class: "com.microsoft.VSCode"
+
+name: pier
+parent: default
+
+matches:
+  # Simple text replacements
+  - trigger: ":ps"
+    replace: |
+              [scripts.a]
+              alias = 'a'
+              description = "a"
+              command = '{{clipboard}}'
+              tags = [ "a" ]
+    vars:
+      - name: "clipboard"
+        type: "clipboard"

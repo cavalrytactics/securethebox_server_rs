@@ -1,0 +1,11 @@
+filter_exec: "/Applications/Visual Studio Code.app"
+# fitler_title: "com.microsoft.VSCode"
+# filter_class: "com.microsoft.VSCode"
+
+name: dictionary
+parent: default
+
+matches:
+  # Simple text replacements
+  - trigger: "print"
+    replace: "println!(\"{}\",$|$)"

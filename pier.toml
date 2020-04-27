@@ -1,55 +1,95 @@
 [scripts.b]
 alias = 'b'
+description = "cargo build"
 command = 'cargo build'
+tags = [ "cargo", "rust" ]
 
 [scripts.r]
 alias = 'r'
+description = "cargo run"
 command = 'cargo run'
+tags = [ "cargo", "rust" ]
 
 [scripts.t]
 alias = 't'
+description = "cargo test"
 command = 'cargo test --no --nocapture --test-threads=1'
+tags = [ "cargo", "rust" ]
 
 [scripts.we]
 alias = 'we'
+description = "watch espanso restart"
 command = 'cargo-watch -w espanso -s "espanso restart"'
+tags = [ "espanso", "watch" ]
 
 [scripts.wr]
 alias = 'wr'
+description = "watch cargo run"
 command = 'cargo-watch -w src -w tests -d 15 -x run'
+tags = [ "cargo", "rust" ]
 
 [scripts.wt]
 alias = 'wt'
+description = "watch cargo test"
 command = 'cargo-watch -w src -w tests -d 15 -x "test --no --nocapture --test-threads=1"'
+tags = [ "cargo", "rust" ]
 
 [scripts.du]
 alias = 'du'
+description = "docker-compose up foreground"
 command = 'docker-compose up'
+tags = [ "docker" ]
 
 [scripts.duu]
 alias = 'dud'
+description = "docker-compose up daemon"
 command = 'docker-compose up -d'
+tags = [ "docker" ]
 
 [scripts.dd]
-alias = 'wt'
+alias = 'dd'
+description = "docker-compose down destroy volume"
 command = 'docker-compose down -v'
+tags = [ "docker" ]
 
 [scripts.ee]
 alias = 'ee'
+description = "espanso edit config"
 command = 'espanso edit'
+tags = [ "espanso" ]
 
 [scripts.es]
 alias = 'es'
+description = "espanso start"
 command = 'espanso start'
+tags = [ "espanso" ]
 
 [scripts.er]
 alias = 'er'
+description = "espanso restart"
 command = 'espanso restart'
+tags = [ "espanso" ]
 
-[scripts.esync]
-alias = 'eo'
-command = 'open https://espanso.org/docs/sync/'
+[scripts.ed]
+alias = 'ed'
+description = "espanso documentation"
+command = 'open https://espanso.org/docs/'
+tags = [ "espanso" ]
 
-[scripts.mie]
-alias = 'mie'
+[scripts.ie]
+alias = 'ie'
+description = "install espanso"
 command = 'brew tap federico-terzi/espanso && brew install espanso'
+tags = [ "install", "espanso" ]
+
+[scripts.if]
+alias = 'if'
+description = "install ff"
+command = 'brew install vishaltelangre/tap/ff'
+tags = [ "install", "ff", "find" ]
+
+[scripts.ir]
+alias = 'ir'
+description = "install ripgrep"
+command = 'brew install ripgrep'
+tags = [ "install", "ripgrep", "find" ]
