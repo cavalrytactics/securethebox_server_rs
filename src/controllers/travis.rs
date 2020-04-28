@@ -248,7 +248,6 @@ pub fn set_current_directory() -> bool {
     };
     c.set_current_directory();
     if c.current_directory != PathBuf::new() {
-        println!("current directory: {:?}", c.current_directory);
         true
     } else {
         false

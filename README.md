@@ -53,8 +53,7 @@ cargo test -- --ignored
 - [cargo-watch](https://github.com/passcod/cargo-watch)
 - [cargo-outdated](https://github.com/kbknapp/cargo-outdated)
 - [pier](https://github.com/pier-cli/pier)
-- [ff](https://github.com/vishaltelangre/ff)
-- [ripgrep](https://github.com/BurntSushi/ripgrep)
+- [ff](https://github.com/vishaltelangre/ff))
   - pier config is already in pier.toml file
 - DO NOT USE rust-clippy its very buggy
 

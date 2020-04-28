@@ -7,9 +7,9 @@ parent: default
 
 matches:
   # Simple text replacements
-  - trigger: ":ps"
+  - trigger: "piers"
     replace: |
-              [scripts.a]
+              [scripts.$|$]
               alias = 'a'
               description = "a"
               command = '{{clipboard}}'

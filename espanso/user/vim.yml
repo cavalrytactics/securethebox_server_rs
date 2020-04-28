@@ -3,15 +3,15 @@ filter_exec: "/Applications/Visual Studio Code.app"
 # filter_class: "com.microsoft.VSCode"
 
 name: vim
-parent: default
+parent: 
 
 matches:
   # Simple text replacements
   - trigger: ":srl"
-    replace: ":%s/old/new/"
+    replace: ":%s/$|$/new/"
 
   - trigger: ":srg"
-    replace: ":%s/old/new/g"
+    replace: ":%s/$|$/new/g"
 
   - trigger: "format"
     replace: "format!(\"{}\",$|$)"

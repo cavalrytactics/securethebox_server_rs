@@ -6,7 +6,7 @@ name: vscode
 prent: default
 
 matches:
-  # Simple text replacementvs
+  # Simple text replacements
   - trigger: "vs"
     replace: "vscode"
 
