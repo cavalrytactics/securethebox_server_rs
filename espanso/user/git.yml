@@ -1,0 +1,37 @@
+# filter_exec: "/Applications/Visual Studio Code.app"
+# fitler_title: "com.microsoft.VSCode"
+# filter_class: "com.microsoft.VSCode"
+
+name: git
+parent: default
+
+matches:
+  # Simple text replacements
+  - trigger: "gitpb"
+    replace: "git push --set-upstream origin {{clipboard}}"
+    vars:
+      - name: "clipboard"
+        type: "clipboard"
+
+  - trigger: "git a"
+    replace: "git add $|$"
+
+  - trigger: "git rm"
+    replace: "git rm --cached $|$"
+
+  - trigger: "git st""
+
+  - trigger: "git cm"
+    replace: "git checkout master"
+
+  - trigger: "git cb"
+    replace: "git checkout -b $|$"
+
+  - trigger: "git co"
+    replace: "git commit -m \"$|$\""
+
+  - trigger: "git p"
+    replace: "git push"
+
+  - trigger: "git f"
+    replace: "git fetch upstream/master"

@@ -6,10 +6,7 @@ name: vscode
 prent: default
 
 matches:
-  # Simple text replacementvs
-  - trigger: "vs"
-    replace: "vscode"
-
+  # Simple text replacements
   - trigger: "trig"
     replace: "trigger: \"$|$\""
   

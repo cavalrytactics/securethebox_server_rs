@@ -93,6 +93,8 @@ impl Terraform {
             .args(&["workspace", "delete", terraform_workspace_name])
             .output()
             .expect("terraform command failed to start");
+        let s = String::from_utf8_lossy(&output.stderr);
+        println!("delete_terraform_workspace OUTPUT:{:?}{:?}",output.stdout, s);    
         if output.status.success() == true {
             println!("Terraform workspace {} deleted!", terraform_workspace_name);
         }

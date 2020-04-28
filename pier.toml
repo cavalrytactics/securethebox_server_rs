@@ -13,7 +13,7 @@ tags = [ "cargo", "rust" ]
 [scripts.t]
 alias = 't'
 description = "cargo test"
-command = 'cargo test --no --nocapture --test-threads=1'
+command = 'cargo test -- --nocapture --test-threads=1'
 tags = [ "cargo", "rust" ]
 
 [scripts.we]
@@ -31,7 +31,7 @@ tags = [ "cargo", "rust" ]
 [scripts.wt]
 alias = 'wt'
 description = "watch cargo test"
-command = 'cargo-watch -w src -w tests -d 15 -x "test --no --nocapture --test-threads=1"'
+command = "cargo-watch -w src -w tests -x 'test -- --nocapture --test-threads=1'"
 tags = [ "cargo", "rust" ]
 
 [scripts.du]

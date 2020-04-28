@@ -14,19 +14,10 @@ matches:
     replace: "format!(\"{}\",$|$)"
 
   - trigger: "Str"
-    replace: "String"
+    replace: "String $|$"
   
   - trigger: ".to_s"
     replace: ".to_string()"
 
   - trigger: "Ok"
     replace: "Ok(())"
-    
-  - trigger: "pfb"    
-    replace: "pub fn f() -> bool {"
-
-  - trigger: ":a"
-    replace: "<a href='{{clipboard}}' />$|$</a>"
-    vars:
-      - name: "clipboard"
-        type: "clipboard"

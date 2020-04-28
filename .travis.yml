@@ -25,3 +25,8 @@ jobs:
       - pwd
       - cargo build --verbose --all
       - cargo test -- --ignored --test-threads=1
+language: rust
+rust:
+  - stable
+  - beta
+  - nightly
