@@ -10,6 +10,7 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use tar::Archive;
 use tar::Builder;
+use yaml_rust::{YamlEmitter, YamlLoader};
 
 pub struct Travis {
     current_directory: PathBuf,
@@ -90,7 +91,7 @@ impl Travis {
                 }
             }
         } // <-- borrow ends here
-        // create a scope
+          // create a scope
         {
             //it env k exists, get v
             if env::var_os(&self.key_var_key) != None {
@@ -110,13 +111,20 @@ impl Travis {
                 }
             }
         } // <-- borrow ends here
-        //if travis binary exists, start encrypt
+          //if travis binary exists, start encrypt
         match Command::new("travis").stdout(Stdio::null()).spawn() {
             Ok(_) => {
                 //encrypt with set kv
                 let _ = Command::new("travis")
-                    .args(&["encrypt-file", "--key", &self.key_var_value, 
-                            "--iv", &self.iv_var_value, "--force", s])
+                    .args(&[
+                        "encrypt-file",
+                        "--key",
+                        &self.key_var_value,
+                        "--iv",
+                        &self.iv_var_value,
+                        "--force",
+                        s,
+                    ])
                     .output()
                     .expect("travis command failed to start");
                 if &self.key_var_key != "" && &self.iv_var_key != "" {
@@ -140,7 +148,6 @@ impl Travis {
     }
     //add decrypt command to .tarvis.yml
     fn add_openssl_cmd(&mut self) {
-        let ty = ".travis.yml".to_string();
         let f = fs::read_to_string(".travis_template.yml");
         let v: serde_json::Value = serde_yaml::from_str(&f.unwrap()).unwrap();
         let mut j = serde_json::json!(&v);
@@ -149,12 +156,13 @@ impl Travis {
             .unwrap();
         let before_install = v["jobs"]["include"]["before_install"].to_string();
         if before_install.contains(&self.decrypt_cmd) == true {
-            println!("decrypt_cmd already in .travis.yml")
         } else {
-            println!("decrypt_cmd not in .travis.yml, adding...");
             bi.push(serde_yaml::from_str(&self.decrypt_cmd).unwrap());
         }
-        let _ = serde_yaml::to_writer(fs::File::create(ty).unwrap(), &j);
+        {
+            let s = serde_yaml::to_string(&j);
+            let _ = fs::write(".travis.yml", &snailquote::unescape(&s.unwrap()).unwrap());
+        }
     }
 
     fn decrypt_tar_secrets(&mut self) {
@@ -163,8 +171,16 @@ impl Travis {
         match Command::new("travis").stdout(Stdio::null()).spawn() {
             Ok(_) => {
                 let output = Command::new("travis")
-                    .args(&["encrypt-file", "-d", "--key", &self.key_var_value, 
-                            "--iv", &self.iv_var_value, "--force", s])
+                    .args(&[
+                        "encrypt-file",
+                        "-d",
+                        "--key",
+                        &self.key_var_value,
+                        "--iv",
+                        &self.iv_var_value,
+                        "--force",
+                        s,
+                    ])
                     .output()
                     .expect("openssl command failed to start");
                 if output.status.success() == true {
@@ -186,7 +202,9 @@ impl Travis {
                             Some(val) => {
                                 self.key_var_value = val.into_string().unwrap();
                             }
-                            None => println!("{} is not defined in the environment.", &self.key_var_key),
+                            None => {
+                                println!("{} is not defined in the environment.", &self.key_var_key)
+                            }
                         }
                     }
                     if env::var_os(&self.iv_var_key) != None {
@@ -194,13 +212,24 @@ impl Travis {
                             Some(val) => {
                                 self.iv_var_value = val.into_string().unwrap();
                             }
-                            None => println!("{} is not defined in the environment.", &self.iv_var_key),
+                            None => {
+                                println!("{} is not defined in the environment.", &self.iv_var_key)
+                            }
                         }
                     }
                     let output = Command::new("openssl")
-                        .args(&[ "aes-256-cbc", "-K", &self.key_var_value, 
-                                "-iv", &self.iv_var_value, "-in", s, 
-                                "-out", o, "-d"])
+                        .args(&[
+                            "aes-256-cbc",
+                            "-K",
+                            &self.key_var_value,
+                            "-iv",
+                            &self.iv_var_value,
+                            "-in",
+                            s,
+                            "-out",
+                            o,
+                            "-d",
+                        ])
                         .output()
                         .expect("openssl command failed to start");
                     if output.status.success() == true {

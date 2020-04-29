@@ -8,16 +8,30 @@ parent: default
 matches:
   # Simple text replacements
   - trigger: "print"
-    replace: "println!(\"{}\",$|$)"
+    replace: "println!(\"{}\",$|$);"
 
   - trigger: "format"
-    replace: "format!(\"{}\",$|$)"
+    replace: "format!(\"{}\",$|$);"
 
   - trigger: "Str"
     replace: "String $|$"
   
   - trigger: ".to_s"
-    replace: ".to_string()"
+    replace: ".to_string();$|$"
 
   - trigger: "Ok"
-    replace: "Ok(())"
+    replace: "Ok(())$|$"
+
+  - trigger: ".unw"
+    replace: ".unwrap();$|$"
+
+  - trigger: "let out"
+    replace: |
+              let out = Command::new("$|$")
+              .args(&["",""])
+              .output()
+              .expect("______ command failed to start");
+
+  - trigger: ".outp"
+    replace: ".output();"
+

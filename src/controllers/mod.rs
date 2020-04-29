@@ -1,3 +1,2 @@
+pub mod docker;pub mod terraform;
 pub mod travis;
-pub mod terraform;
-pub mod docker;

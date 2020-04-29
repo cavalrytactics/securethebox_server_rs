@@ -19,8 +19,6 @@ matches:
   - trigger: "git rm"
     replace: "git rm --cached $|$"
 
-  - trigger: "git st""
-
   - trigger: "git cm"
     replace: "git checkout master"
 

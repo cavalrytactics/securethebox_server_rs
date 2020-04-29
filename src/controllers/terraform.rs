@@ -90,11 +90,10 @@ impl Terraform {
     fn delete_terraform_workspace(&mut self, terraform_workspace_name: &String) {
         self.select_terraform_workspace(&"main".to_string());
         let output = Command::new("terraform")
-            .args(&["workspace", "delete", terraform_workspace_name])
+            .args(&["workspace", "delete", "-force", terraform_workspace_name])
             .output()
             .expect("terraform command failed to start");
-        let s = String::from_utf8_lossy(&output.stderr);
-        println!("delete_terraform_workspace OUTPUT:{:?}{:?}",output.stdout, s);    
+        // let  = String::from_utf8_lossy(&output.stderr);
         if output.status.success() == true {
             println!("Terraform workspace {} deleted!", terraform_workspace_name);
         }
@@ -110,8 +109,8 @@ impl Terraform {
         }
     }
     fn plan(&mut self) {
-        // do not use "-out", may contain secrets 
-        // https://www.terraform.io/docs/commands/plan.html#security-warning    
+        // do not use "-out", may contain secrets
+        // https://www.terraform.io/docs/commands/plan.html#security-warning
         let mut output = Command::new("terraform")
             .args(&[
                 "plan",
@@ -132,7 +131,7 @@ impl Terraform {
         println!("Exited with status {:?}", status);
     }
     fn apply(&mut self) {
-        let mut output = Command::new("terraform")
+        let _ = Command::new("terraform")
             .args(&[
                 "apply",
                 "-input=false",
@@ -145,8 +144,8 @@ impl Terraform {
             .stderr(Stdio::inherit())
             .spawn()
             .unwrap();
-        let status = output.wait();
-        println!("Exited with status {:?}", status);
+        // let status = output.wait();
+        // println!("Exited with status {:?}", status);
     }
     fn destroy(&mut self) {
         let mut output = Command::new("terraform")

@@ -67,10 +67,16 @@ impl Docker {
                     //encrypt with set kv
                     println!("docker command found!, building docker image!");
                     let output = Command::new("docker")
-                        .args(&[ "build", ".", "--build-arg",
-                        &format!("key={}", &self.key_var_value), "--build-arg", 
-                        &format!("iv={}", &self.iv_var_value), "--tag", 
-                        "securthebox_server_rs:latest"])
+                        .args(&[
+                            "build",
+                            ".",
+                            "--build-arg",
+                            &format!("key={}", &self.key_var_value),
+                            "--build-arg",
+                            &format!("iv={}", &self.iv_var_value),
+                            "--tag",
+                            "securthebox_server_rs:latest",
+                        ])
                         .output()
                         .expect("docker command failed to start");
                     println!("building image! takes");
@@ -110,15 +116,14 @@ pub fn build_image() -> bool {
     {
         Ok(_) => {
             let output = Command::new("docker")
-                        .args(&[ "images", "-q", 
-                            "securethebox_server_rs:latest"])
-                        .output()
-                        .expect("docker command not found");
+                .args(&["images", "-q", "securethebox_server_rs:latest"])
+                .output()
+                .expect("docker command not found");
             let s = String::from_utf8_lossy(&output.stdout);
             println!("Docker Image ID:{}", s);
             if s != "" {
                 true
-            }else {
+            } else {
                 false
             }
         }
