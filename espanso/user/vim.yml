@@ -12,6 +12,3 @@ matches:
 
   - trigger: ":srg"
     replace: ":%s/$|$/new/g"
-
-  - trigger: "format"
-    replace: "format!(\"{}\",$|$)"

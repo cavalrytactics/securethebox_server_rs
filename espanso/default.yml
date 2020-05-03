@@ -1,4 +1,4 @@
-# espanso configuration file
+
 # This is the default configuration file, change it as you like it
 # You can refer to the official documentation:
 # https://espanso.org/docs/
@@ -90,7 +90,7 @@ matches:
               single line of text
               despite appearances
   # Clipboard
-  - trigger: ":a"
+  - trigger: ":arstastratsasrt"
     replace: "<a href='{{clipboard}}' />$|$</a>"
     vars:
       - name: "clipboard"

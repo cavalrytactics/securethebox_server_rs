@@ -14,7 +14,7 @@ matches:
     replace: "format!(\"{}\",$|$);"
 
   - trigger: "Str"
-    replace: "String $|$"
+    replace: "String$|$"
   
   - trigger: ".to_s"
     replace: ".to_string();$|$"

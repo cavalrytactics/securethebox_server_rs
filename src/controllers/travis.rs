@@ -10,7 +10,6 @@ use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 use tar::Archive;
 use tar::Builder;
-use yaml_rust::{YamlEmitter, YamlLoader};
 
 pub struct Travis {
     current_directory: PathBuf,

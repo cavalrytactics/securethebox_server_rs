@@ -8,7 +8,7 @@ parent: default
 matches:
   # Simple text replacements
   - trigger: "gitpb"
-    replace: "git push --set-upstream origin {{clipboard}}"
+    replace: "git push --set-upstream origin {{clipboard}}$|$"
     vars:
       - name: "clipboard"
         type: "clipboard"
@@ -20,7 +20,7 @@ matches:
     replace: "git rm --cached $|$"
 
   - trigger: "git cm"
-    replace: "git checkout master"
+    replace: "git checkout master$|$"
 
   - trigger: "git cb"
     replace: "git checkout -b $|$"
@@ -29,7 +29,7 @@ matches:
     replace: "git commit -m \"$|$\""
 
   - trigger: "git p"
-    replace: "git push"
+    replace: "git push$|$"
 
   - trigger: "git f"
-    replace: "git fetch upstream/master"
+    replace: "git fetch upstream/master$|$"

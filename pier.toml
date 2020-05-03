@@ -93,3 +93,111 @@ alias = 'ir'
 description = "install ripgrep"
 command = 'brew install ripgrep'
 tags = [ "install", "ripgrep", "find" ]
+
+[scripts.mac-mission]
+alias = ''
+description = "mission control move left|right desktop"
+command = 'left_command + j|;'
+tags = [ "mission-control" ]
+
+[scripts.amethyst-select]
+alias = ''
+description = "move mouse to monitor {num}"
+command = 'left_command + right_control + {num}'
+tags = [ "amethyst"]
+
+[scripts.amethyst-move]
+alias = ''
+description = "move window to monitor {num}"
+command = 'left_command + right_control + shift + {num}'
+tags = [ "amethyst"]
+
+[scripts.tmux-move]
+alias = ''
+description = "move to screen {num}"
+command = 'right_control + w > {num}'
+tags = [ "tmux"]
+
+[scripts.tmux-split-V]
+alias = ''
+description = "split screen vertically"
+command = 'right_control + w > percent(%)'
+tags = [ "tmux"]
+
+[scripts.tmux-split-H]
+alias = ''
+description = "split screen horizontally"
+command = 'right_control + w > double-quote(")'
+tags = [ "tmux"]
+
+[scripts.tmux-split-Z]
+alias = ''
+description = "zoom/unzoom a screen"
+command = 'right_control + w > z'
+tags = [ "tmux"]
+
+[scripts.tmux-move-LR]
+alias = ''
+description = "move split window left|right"
+command = 'right_control + w > {|}'
+tags = [ "tmux"]
+
+[scripts.tmux-select]
+alias = ''
+description = "select split window up|down|left|right"
+command = 'right_control + w > left_control + shift + k|j|h|l'
+tags = [ "tmux"]
+
+[scripts.tmux-close]
+alias = ''
+description = "close screen"
+command = 'right_control + w > x'
+tags = [ "tmux"]
+
+[scripts.tmux-name]
+alias = ''
+description = "rename screen"
+command = 'right_control + w > comma(,)'
+tags = [ "tmux", "rename"]
+
+[scripts.vim-cursor-move-num-lines]
+alias = ''
+description = "cursor move {num} lines up|down"
+command = '{num} > j|k'
+tags = [ "vim", "cursor"]
+
+[scripts.vim-cursor-to-num-line]
+alias = ''
+description = "cursor move to line {num}"
+command = '{num} > shift + g'
+tags = [ "vim", "cursor"]
+
+[scripts.vim-cursor-move-line]
+alias = ''
+description = "cursor move start|end of current line"
+command = 'right_control + 0 or a|f or $'
+tags = [ "vim", "cursor" ]
+
+[scripts.vim-cursor-find-char]
+alias = ''
+description = "cursor move to {char} backward|forward of current line"
+command = 'f > {char} > comma(,)|semicolon(;)'
+tags = [ "vim", "cursor"]
+
+[scripts.vim-cursor-move-word]
+alias = ''
+description = "cursor move to back|next start of word"
+command = 'normal-mode > b|w'
+tags = [ "vim", "cursor", "word"]
+
+[scripts.vim-select-enclosed]
+alias = ''
+description = "select matching {}|()"
+command = 'shift + v > percent(%)'
+tags = [ "vim", "select"]
+
+[scripts.vscode-move-split-LR]
+alias = ''
+description = "move split window right|left"
+command = 'left_command + right_control > g|j'
+tags = [ "vim", "select"]

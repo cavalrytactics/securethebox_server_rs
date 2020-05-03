@@ -84,3 +84,32 @@ p du
 - [STD Libraries](https://github.com/brson/stdx)
 - [DataTypes Cheatsheet](https://cheat.rs)
 - [Rust for Pros](https://overexact.com/rust-for-professionals/)
+
+## TODO
+- [x] P0 - Dev: Standardize Tests
+- [x] P0 - Dev: Encrypted/Decrypted Secrets
+- [x] P0 - Dev: Travis Test/Deploy
+- [x] P0 - Feat: Travis Controller
+- [x] P0 - Feat: Terraform Controller
+- [x] P0 - Feat: Terraform apply/destroy Kubernetes Cluster
+- [x] P0 - Dev: Seed Database
+- [ ] P0 - Feat: GraphQL Schema - MongoDB Stitch
+- [ ] P0 - Feat: GraphQL API - MongoDB Stitch
+- [ ] P0 - Feat: Authentication GraphQL API 
+- [ ] P0 - Feat: Websocket/Subscriptions Scoring
+- [x] P0 - Feat: Web Server Actix-Web
+- [x] P0 - Dev: Dockerfile
+- [x] P0 - Dev: Docker-Compose
+- [ ] P0 - Feat: Challenge Creation
+- [ ] P0 - Feat: Challenge Start
+- [ ] P0 - Feat: Challenge Report 
+- [ ] P0 - Feat: Challenge End 
+- [ ] P0 - Feat: Proxy user environment
+- [ ] P0 - Feat: Load Balancer
+- [ ] P0 - Feat: SSH Access to each POD 
+- [ ] P0 - Feat: Configuration Management of Containers (ConfigMaps)
+- [ ] P0 - Feat: Challenge Vulnerable App (juice-shop)
+- [ ] P0 - Feat: Challenge Logging
+- [ ] P0 - Feat: Challenge SIEM
+- [ ] P0 - Feat: Challenge 
+- [ ] P2 - Feat: RBAC - Casbin-rs 

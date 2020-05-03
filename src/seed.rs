@@ -8,7 +8,7 @@ use mongodb_base_service::BaseService;
 use std::sync::Arc;
 
 use crate::db::Clients;
-use crate::models::{Owner, Pet};
+use crate::models::{Pet, Vulnerability};
 use crate::schema::{create_schema, Schema};
 
 fn main() {
@@ -21,34 +21,32 @@ fn main() {
     });
 
     // drop the existing data
-    let owners_service = db_clients.mongo.get_mongo_service("owners").unwrap();
-    let _ = owners_service.data_source().drop(None);
+    let vulnerabilities_service = db_clients
+        .mongo
+        .get_mongo_service("vulnerabilities")
+        .unwrap();
+    let _ = vulnerabilities_service.data_source().drop(None);
 
     let pets_service = db_clients.mongo.get_mongo_service("pets").unwrap();
     let _ = pets_service.data_source().drop(None);
 
     // seed data
-    // create owners first
-    let owners = vec![
+    let vulnerabilities = vec![
         {
-            doc! { "username": "jsmith", "first_name": "John", "last_name": "Smith", "gender": "Male" }
+            doc! {"scope": "application", "type": "injection" }
         },
         {
-            doc! { "username": "janejohnson", "first_name": "Jane", "last_name": "Johnson", "gender": "Female" }
+            doc! {"scope": "application", "type": "broken_authentication" }
         },
         {
-            doc! { "username": "bgoldman", "first_name": "Bob", "last_name": "Goldman", "gender": "Male" }
-        },
-        {
-            doc! { "username": "emartinez", "first_name": "Eileen", "last_name": "Martinez", "gender": "Female" }
-        },
-        {
-            doc! { "username": "helenp78", "first_name": "Helen", "last_name": "Phillips", "gender": "Female" }
+            doc! { "scope": "infrastructure", "type": "misconfiguration"}
         },
     ];
 
     // add the owners
-    let results: Vec<Owner> = owners_service.insert_many(owners, None).unwrap();
+    let results: Vec<Vulnerability> = vulnerabilities_service
+        .insert_many(vulnerabilities, None)
+        .unwrap();
     let ids: Vec<String> = results.iter().map(|x| x.node.id.to_string()).collect();
     let pets = vec![
         {

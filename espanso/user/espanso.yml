@@ -2,14 +2,14 @@ filter_exec: "/Applications/Visual Studio Code.app"
 # filter_class: "com.microsoft.VSCode"
 # fitler_title: "com.microsoft.VSCode"
 
-name: vscode
+name: espanso
 prent: default
 
 matches:
   # Simple text replacements
   - trigger: "trig"
-    replace: "trigger: \"$|$\""
-  
+    replace: |
+              - trigger: "$|$"
+                replace: ""
   - trigger: "repl"
     replace: "replace: \"$|$\""
-    
