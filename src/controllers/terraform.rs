@@ -69,7 +69,7 @@ impl Terraform {
     }
     fn create_terraform_workspace(&mut self, terraform_workspace_name: &String) {
         self.terraform_workspace_name = terraform_workspace_name.to_string();
-        let output = Command::new("terraform")
+        let output = Command::new("/usr/local/bin/terraform")
             .args(&["workspace", "new", terraform_workspace_name])
             .output()
             .expect("terraform command failed to start");
@@ -78,7 +78,7 @@ impl Terraform {
         }
     }
     fn select_terraform_workspace(&mut self, terraform_workspace_name: &String) {
-        let output = Command::new("terraform")
+        let output = Command::new("/usr/local/bin/terraform")
             .args(&["workspace", "select", terraform_workspace_name])
             .output()
             .expect("terraform command failed to start");
@@ -89,7 +89,7 @@ impl Terraform {
     // cannot delete a workspace that is currenty selected
     fn delete_terraform_workspace(&mut self, terraform_workspace_name: &String) {
         self.select_terraform_workspace(&"main".to_string());
-        let output = Command::new("terraform")
+        let output = Command::new("/usr/local/bin/terraform")
             .args(&["workspace", "delete", "-force", terraform_workspace_name])
             .output()
             .expect("terraform command failed to start");
@@ -99,7 +99,7 @@ impl Terraform {
         }
     }
     fn init(&mut self) {
-        let output = Command::new("terraform")
+        let output = Command::new("/usr/local/bin/terraform")
             .args(&["init", "-input=false", &self.terraform_path])
             .output()
             .expect("terraform command failed to start");
@@ -111,7 +111,7 @@ impl Terraform {
     fn plan(&mut self) {
         // do not use "-out", may contain secrets
         // https://www.terraform.io/docs/commands/plan.html#security-warning
-        let mut output = Command::new("terraform")
+        let mut output = Command::new("/usr/local/bin/terraform")
             .args(&[
                 "plan",
                 "-input=false",
@@ -131,7 +131,7 @@ impl Terraform {
         println!("Exited with status {:?}", status);
     }
     fn apply(&mut self) {
-        let _ = Command::new("terraform")
+        let _ = Command::new("/usr/local/bin/terraform")
             .args(&[
                 "apply",
                 "-input=false",
@@ -148,7 +148,7 @@ impl Terraform {
         // println!("Exited with status {:?}", status);
     }
     fn destroy(&mut self) {
-        let mut output = Command::new("terraform")
+        let mut output = Command::new("/usr/local/bin/terraform")
             .args(&[
                 "destroy",
                 "-input=false",
