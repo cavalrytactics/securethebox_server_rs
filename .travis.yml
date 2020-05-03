@@ -9,7 +9,9 @@ before_install:
 - sudo apt-get install kubectl -y
 - wget https://releases.hashicorp.com/terraform/"$tf_version"/terraform_"$tf_version"_linux_amd64.zip
 - unzip terraform_"$tf_version"_linux_amd64.zip
+- sudo chmod +x terraform
 - sudo mv terraform /usr/local/bin/
+- terraform
 - ls -la /usr/local/bin/
 - rm terraform_"$tf_version"_linux_amd64.zip
 - openssl aes-256-cbc -K $encrypted_cdc0677920ab_key -iv $encrypted_cdc0677920ab_iv -in secrets.tar.gz.enc -out secrets.tar.gz -d  && tar xvf secrets.tar.gz
