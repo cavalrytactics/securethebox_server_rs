@@ -8,7 +8,10 @@ use mongodb_base_service::BaseService;
 use std::sync::Arc;
 
 use crate::db::Clients;
-use crate::models::{Pet, Vulnerability};
+use crate::models::{
+    Application, Cluster, Configuration, Course, Credential, Dummy, Job, Problem, Rank, Report,
+    Service, Solution, Submission, Team, University, User, Vulnerability,
+};
 use crate::schema::{create_schema, Schema};
 
 fn main() {
