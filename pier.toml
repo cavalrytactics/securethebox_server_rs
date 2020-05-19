@@ -4,6 +4,24 @@ description = "cargo build"
 command = 'cargo build'
 tags = [ "cargo", "rust" ]
 
+[scripts.wasmb]
+alias = 'wasmb'
+description = "wasmb"
+command = 'cargo make build'
+tags = [ "cargo", "make", "rust" ]
+
+[scripts.wasms]
+alias = 'wasms'
+description = "wasms"
+command = 'cargo make start'
+tags = [ "cargo", "make", "rust" ]
+
+[scripts.wasmr]
+alias = 'wasmr'
+description = "wasmr"
+command = 'cargo make build_client_release'
+tags = [ "cargo", "make", "rust" ]
+
 [scripts.r]
 alias = 'r'
 description = "cargo run"

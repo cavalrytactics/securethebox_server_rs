@@ -10,8 +10,18 @@
 - [docker desktop for mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac/)
 - [terraform cli: v12.24](https://www.terraform.io/downloads.html)
 - [gcloud sdk cli](https://cloud.google.com/sdk/docs/downloads-interactive)
-- [rust](https://www.rust-lang.org/tools/install)
+- [rust & rustup](https://www.rust-lang.org/tools/install)
+- [rustsym](https://github.com/trixnz/rustsym)
 
+## Updating Rust
+```
+rustup update
+```
+## Rust Nightly | Stable
+```
+rustup default nightly
+rustup default stable
+```
 ## Building
 ```
 cargo build

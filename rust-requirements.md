@@ -4,9 +4,9 @@
     - Rust
       - https://hub.docker.com/_/rust
     - Graphql
-      - https://github.com/jayy-lmao/rust-graphql-docker
+      - https://github.com/async-graphql
     - Web
-      - https://github.com/seanmonstar/warp
+      - https://github.com/actix/actix-web
     - Authentication
       - Google Outh2
 
@@ -28,13 +28,10 @@
 
 - GraphQL support
   [RUST]
-    - https://github.com/graphql-rust/juniper
+    - async-graphql
       - supports actix-web
-  - Needs to support Subscriptions <<< Unstable
-    - https://github.com/graphql-rust/juniper/blob/8bcd1e5bfea8ee73082ddc8220f4a5fb989f3f51/docs/book/content/advanced/subscriptions.md
-  - Supports MongoDB client and change steams
+  - Supports MongoDB client and change streams
     - https://github.com/mongodb/mongo-rust-driver
-    - https://github.com/mongodb/mongo-rust-driver/pull/30
 - System Commands
   [RUST]
     - Kubernetes

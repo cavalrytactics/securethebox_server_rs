@@ -1,51 +1,54 @@
-use actix_web::middleware::{DefaultHeaders, Logger};
-use actix_web::{App, HttpServer};
-use dotenv::dotenv;
-use std::io;
-use std::sync::Arc;
-use uuid::Uuid;
+use actix_web::middleware::Logger;
+use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
+use actix_web_actors::ws;
+use async_graphql::http::{playground_source, GQLResponse};
+use async_graphql::Schema;
+use async_graphql_actix_web::{GQLRequest, WSSubscription};
+use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
-mod db;
-mod models;
-mod routes;
-mod schema;
+async fn index(schema: web::Data<BooksSchema>, gql_request: GQLRequest) -> web::Json<GQLResponse> {
+    web::Json(GQLResponse(gql_request.into_inner().execute(&schema).await))
+}
 
-use crate::db::Clients;
-use crate::routes::app_routes;
-use crate::schema::create_schema;
+async fn index_playground() -> Result<HttpResponse> {
+    Ok(HttpResponse::Ok()
+        .content_type("text/html; charset=utf-8")
+        .body(playground_source("/", Some("/"))))
+}
+
+async fn index_ws(
+    schema: web::Data<BooksSchema>,
+    req: HttpRequest,
+    payload: web::Payload,
+) -> Result<HttpResponse> {
+    ws::start_with_protocols(WSSubscription::new(&schema), &["graphql-ws"], &req, payload)
+}
 
 #[actix_rt::main]
-async fn main() -> io::Result<()> {
-    std::env::set_var("RUST_LOG", "info,actix_web=warn");
+async fn main() -> std::io::Result<()> {
+    std::env::set_var("RUST_LOG", "debug");
+    std::env::set_var("RUST_BACKTRACE", "full");
     env_logger::init();
-    dotenv().ok();
+    let schema = Schema::build(QueryRoot, MutationRoot, SubscriptionRoot)
+        .data(Storage::default())
+        .finish();
 
-    let port = dotenv::var("PORT").unwrap_or("8080".to_owned());
+    println!("Playground: http://localhost:8000");
 
-    let db_clients = Arc::new(Clients {
-        mongo: db::mongo::connect(),
-    });
-
-    let gql = std::sync::Arc::new(create_schema());
-    // Start actix http server
     HttpServer::new(move || {
         App::new()
-            .data(gql.clone())
-            .data(db_clients.clone())
-            .wrap(DefaultHeaders::new().header("x-request-id", Uuid::new_v4().to_string()))
-            .wrap(Logger::new(
-                "
-                IP:%a
-                DATETIME:%t
-                REQUEST:\"%r\"
-                STATUS: %s
-                DURATION:%D
-                X-REQUEST-ID:%{x-request-id}o
-            ",
-            ))
-            .configure(app_routes)
+            .data(schema.clone())
+            .service(web::resource("/").guard(guard::Post()).to(index))
+            .service(
+                web::resource("/")
+                    .guard(guard::Get())
+                    .guard(guard::Header("upgrade", "websocket"))
+                    .to(index_ws),
+            )
+            .service(web::resource("/").guard(guard::Get()).to(index_playground))
+            .wrap(Logger::new("REQUEST:\"%U\" STATUS: %s"))
     })
-    .bind(format!("0.0.0.0:{}", port))?
+    .bind("127.0.0.1:8000")?
     .run()
     .await
 }
