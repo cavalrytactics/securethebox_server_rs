@@ -36,8 +36,6 @@ async fn main() -> std::io::Result<()> {
         .data(Storage::default())
         .finish();
 
-    println!("Playground: http://localhost:8000");
-
     HttpServer::new(move || {
         App::new()
             .data(schema.clone())
@@ -52,6 +50,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::new("REQUEST:\"%U\" STATUS: %s"))
             .wrap(
                 Cors::new()
+                    .allowed_origin("http://localhost:8000")
                     .allowed_origin("http://localhost:7000")
                     .allowed_methods(vec!["GET", "POST"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
