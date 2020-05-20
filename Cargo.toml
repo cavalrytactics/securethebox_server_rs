@@ -9,10 +9,6 @@ default-run = "main"
 name = "main"
 path = "src/main.rs"
 
-[[bin]]
-name = "schema_gen"
-path = "src/bin/schema_gen.rs"
-
 [dependencies]
 # common
 flate2 = "1.0.14"
@@ -28,6 +24,7 @@ snailquote = "0.3.0"
 actix-web = "2.0.0"
 actix-web-actors = "2.0.0"
 actix-rt = "1.0.0"
+actix-cors = "0.2.0"
 env_logger = "0.7.1"
 
 # async-graphql

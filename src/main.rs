@@ -1,9 +1,12 @@
+use actix_cors::Cors;
 use actix_web::middleware::Logger;
-use actix_web::{guard, web, App, HttpRequest, HttpResponse, HttpServer, Result};
+use actix_web::{guard, http, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
+
 use async_graphql::http::{playground_source, GQLResponse};
 use async_graphql::Schema;
 use async_graphql_actix_web::{GQLRequest, WSSubscription};
+
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
 async fn index(schema: web::Data<BooksSchema>, gql_request: GQLRequest) -> web::Json<GQLResponse> {
@@ -47,8 +50,17 @@ async fn main() -> std::io::Result<()> {
             )
             .service(web::resource("/").guard(guard::Get()).to(index_playground))
             .wrap(Logger::new("REQUEST:\"%U\" STATUS: %s"))
+            .wrap(
+                Cors::new()
+                    .allowed_origin("http://localhost:7000")
+                    .allowed_methods(vec!["GET", "POST"])
+                    .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+                    .allowed_header(http::header::CONTENT_TYPE)
+                    .max_age(3600)
+                    .finish(),
+            )
     })
-    .bind("127.0.0.1:8000")?
+    .bind("0.0.0.0:8000")?
     .run()
     .await
 }
