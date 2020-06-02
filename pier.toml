@@ -1,3 +1,43 @@
+#
+# Create Symlinks to all Directory paths you normally use
+# ln -s "/source/path" "/destination"
+# export PIER_CONFIG_PATH="/destination/pier.toml"
+[scripts.cs]
+alias = 'cs'
+description = "start client"
+command = 'cd /Users/charleschong/go/src/securethebox_rs/securethebox_client_rs && cargo make start_release'
+tags = [ "cargo", "rust" ]
+
+[scripts.ss]
+alias = 'ss'
+description = "start server"
+command = 'cd /Users/charleschong/go/src/securethebox_rs/securethebox_server_rs && cargo run'
+tags = [ "cargo", "rust" ]
+
+[scripts.sw]
+alias = 'sw'
+description = "watch server"
+command = 'cd /Users/charleschong/go/src/securethebox_rs/securethebox_server_rs && cargo-watch -w src -d 15 -x run'
+tags = [ "cargo", "rust" ]
+
+[scripts.cw]
+alias = 'cw'
+description = "watch client"
+command = "cd /Users/charleschong/go/src/securethebox_rs/securethebox_client_rs && cargo-watch -w src -d 15 -s 'cargo make start_release'"
+tags = [ "cargo", "rust" ]
+
+[scripts.ck]
+alias = 'ck'
+description = "kill server"
+command = 'lsof -ti:7000 | xargs kill'
+tags = [ "cargo", "rust" ]
+
+[scripts.sk]
+alias = 'sk'
+description = "kill server"
+command = 'lsof -ti:8000 | xargs kill'
+tags = [ "cargo", "rust" ]
+
 [scripts.b]
 alias = 'b'
 description = "cargo build"
@@ -37,20 +77,26 @@ tags = [ "cargo", "rust" ]
 [scripts.we]
 alias = 'we'
 description = "watch espanso restart"
-command = 'cargo-watch -w espanso -s "espanso restart"'
-tags = [ "espanso", "watch" ]
+command = 'cargo-watch -s "brew upgrade federico-terzi/espanso/espanso" -w espanso -s "espanso restart"'
+tags = [ "watch", "espanso" ]
+
+[scripts.wx]
+alias = 'wx'
+description = "watch upgrade all"
+command = 'cargo-watch -w -s "rustup set profile nightly" -s "rustup default nightly" -s "rustup update" -s "brew upgrade federico-terzi/espanso/espanso"'
+tags = [ "watch", "rustup", "espanso" ]
 
 [scripts.wr]
 alias = 'wr'
 description = "watch cargo run"
 command = 'cargo-watch -w src -w tests -d 15 -x run'
-tags = [ "cargo", "rust" ]
+tags = [ "watch", "cargo", "rust" ]
 
 [scripts.wt]
 alias = 'wt'
 description = "watch cargo test"
 command = "cargo-watch -w src -w tests -x 'test -- --nocapture --test-threads=1'"
-tags = [ "cargo", "rust" ]
+tags = [ "watch", "cargo", "rust" ]
 
 [scripts.du]
 alias = 'du'

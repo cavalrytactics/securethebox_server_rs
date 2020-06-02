@@ -1,6 +1,6 @@
-filter_exec: "/Applications/Visual Studio Code.app"
-# fitler_title: "com.microsoft.VSCode"
-# filter_class: "com.microsoft.VSCode"
+filter_exec: "/Applications/Alacritty.app/Contents/MacOS/alacritty"
+filter_title: "io.alacritty"
+filter_class: "io.alacritty"
 
 name: rust
 parent: default
@@ -15,7 +15,7 @@ matches:
 
   - trigger: "Str"
     replace: "String$|$"
-  
+
   - trigger: ".to_s"
     replace: ".to_string();$|$"
 

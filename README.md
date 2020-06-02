@@ -1,15 +1,12 @@
 # securethebox_server_rs
 ## Overview
-- frontend framework: [yew](https://github.com/yewstack/yew)
 - web framework: [actix-web](https://github.com/actix/actix-web)
-- graphql service: [juniper](https://github.com/graphql-rust/juniper)
+- graphql service: [async-graphql](https://github.com/async-graphql/async-graphql)
 - database service: [mongodb-rust-driver](https://github.com/mongodb/mongo-rust-driver)
+- frontend: [securethebox_client_rs](https://github.com/cavalrytactics/securethebox_client_rs)
 
 ## Requirements for local dev
 - [travis-ci cli: latest](https://github.com/travis-ci/travis.rb#mac-os-x-via-homebrew)
-- [docker desktop for mac](https://hub.docker.com/editions/community/docker-ce-desktop-mac/)
-- [terraform cli: v12.24](https://www.terraform.io/downloads.html)
-- [gcloud sdk cli](https://cloud.google.com/sdk/docs/downloads-interactive)
 - [rust & rustup](https://www.rust-lang.org/tools/install)
 - [rustsym](https://github.com/trixnz/rustsym)
 
@@ -19,6 +16,7 @@ rustup update
 ```
 ## Rust Nightly | Stable
 ```
+rustup set profile 
 rustup default nightly
 rustup default stable
 ```
@@ -103,16 +101,16 @@ p du
 - [x] P0 - Feat: Terraform Controller
 - [x] P0 - Feat: Terraform apply/destroy Kubernetes Cluster
 - [x] P0 - Dev: Seed Database
-- [ ] P0 - Feat: GraphQL Schema - MongoDB Stitch
-- [ ] P0 - Feat: GraphQL API - MongoDB Stitch
+- [ ] P0 - Feat: GraphQL Schema 
+- [x] P0 - Feat: GraphQL API (async-graphql)
 - [ ] P0 - Feat: Authentication GraphQL API 
-- [ ] P0 - Feat: Websocket/Subscriptions Scoring
+- [x] P0 - Feat: Websocket/Subscriptions
 - [x] P0 - Feat: Web Server Actix-Web
 - [x] P0 - Dev: Dockerfile
 - [x] P0 - Dev: Docker-Compose
 - [ ] P0 - Feat: Challenge Creation
 - [ ] P0 - Feat: Challenge Start
-- [ ] P0 - Feat: Challenge Report 
+- [ ] P0 - Feat: Challenge Report
 - [ ] P0 - Feat: Challenge End 
 - [ ] P0 - Feat: Proxy user environment
 - [ ] P0 - Feat: Load Balancer

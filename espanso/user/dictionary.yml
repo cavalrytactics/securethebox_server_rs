@@ -1,12 +1,12 @@
-# filter_exec: "/Applications/Visual Studio Code.app"
-# fitler_title: "com.microsoft.VSCode"
-# filter_class: "com.microsoft.VSCode"
+filter_exec: "/Applications/Alacritty.app/Contents/MacOS/alacritty"
+filter_title: "io.alacritty"
+filter_class: "io.alacritty"
 name: dictionary
 parent: default
 
 matches:
   # Simple text replacements
-  - trigger: "secure"
+  - trigger: "stb"
     replace: "securethebox$|$"
   - trigger: "authe"
     replace: "authentication$|$"
@@ -46,15 +46,15 @@ matches:
     replace: "container$|$"
   - trigger: "Conta"
     replace: "Container$|$"
-  - trigger: "conf"
+  - trigger: "configu"
     replace: "configuration$|$"
-  - trigger: "Conf"
+  - trigger: "Configu"
     replace: "Configuration$|$"
   - trigger: "Vuln"
     replace: "Vulnerabilit$|$"
   - trigger: "vuln"
     replace: "vulnerabilit$|$"
-  - trigger: "serv"
+  - trigger: "servi"
     replace: "service$|$"
   - trigger: "desc"
     replace: "description$|$"

@@ -28,8 +28,8 @@ actix-cors = "0.2.0"
 env_logger = "0.7.1"
 
 # async-graphql
-async-graphql = "1.12.2"
-async-graphql-actix-web = "1.4.2"
+async-graphql = "1.12.17"
+async-graphql-actix-web = "1.4.17"
 books = { path = "./models/books" }
 
 # mongodb

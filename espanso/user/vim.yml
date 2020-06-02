@@ -1,9 +1,9 @@
-filter_exec: "/Applications/Visual Studio Code.app"
-# fitler_title: "com.microsoft.VSCode"
-# filter_class: "com.microsoft.VSCode"
+filter_exec: "/Applications/Alacritty.app/Contents/MacOS/alacritty"
+filter_title: "io.alacritty"
+filter_class: "io.alacritty"
 
 name: vim
-parent: 
+parent: default
 
 matches:
   # Simple text replacements
@@ -12,3 +12,35 @@ matches:
 
   - trigger: ":srg"
     replace: ":%s/$|$/new/g"
+
+  - trigger: ":Vi"
+    replace: ":VimBeGood"
+
+  - trigger: ":Up"
+    replace: ":UpdateRemotePlugins\n"
+
+  - trigger: ":vvv"
+    replace: "nvim\n:VimBeGood\n"
+
+  - trigger: ":mmmmm"
+    replace: ":q!\nnvim\n:VimBeGood\n"
+
+  - trigger: ":ppppp"
+    replace: ":q!\nnvim\n:PlugInstall\n"
+
+  - trigger: ":PlugI"
+    replace: ":PlugInstall\n"
+
+  - trigger: ":PlugC"
+    replace: ":PlugClean\n"
+
+  - trigger: ":svi"
+    replace: "nvim\n:source ~/.vimrc\n:q!\n:q!\n"
+
+  - trigger: ":stm"
+    replace: "tmux source ~/.tmux.conf\n"
+
+  - trigger: ":szsh"
+    replace: "source ~/.zshrc\n"
+
+

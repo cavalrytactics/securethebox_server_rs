@@ -3,14 +3,14 @@ use actix_web::middleware::Logger;
 use actix_web::{guard, http, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
 
-use async_graphql::http::{playground_source, GQLResponse};
+use async_graphql::http::playground_source;
 use async_graphql::Schema;
-use async_graphql_actix_web::{GQLRequest, WSSubscription};
+use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
 
 use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
-async fn index(schema: web::Data<BooksSchema>, gql_request: GQLRequest) -> web::Json<GQLResponse> {
-    web::Json(GQLResponse(gql_request.into_inner().execute(&schema).await))
+async fn index(schema: web::Data<BooksSchema>, req: GQLRequest) -> GQLResponse {
+    req.into_inner().execute(&schema).await.into()
 }
 
 async fn index_playground() -> Result<HttpResponse> {
@@ -47,11 +47,17 @@ async fn main() -> std::io::Result<()> {
                     .to(index_ws),
             )
             .service(web::resource("/").guard(guard::Get()).to(index_playground))
-            .wrap(Logger::new("REQUEST:\"%U\" STATUS: %s"))
+            .wrap(Logger::new("REQUEST:\"%U\" STATUS: %s IP: %a"))
             .wrap(
                 Cors::new()
                     .allowed_origin("http://localhost:8000")
                     .allowed_origin("http://localhost:7000")
+                    .allowed_origin("http://c2.local:8000")
+                    .allowed_origin("http://c2.local:7000")
+                    .allowed_origin("192.168.1.5")
+                    .allowed_origin("0.0.0.0")
+                    .allowed_origin("All")
+                    .allowed_origin("send_wildcard")
                     .allowed_methods(vec!["GET", "POST"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
                     .allowed_header(http::header::CONTENT_TYPE)

@@ -1,0 +1,4 @@
+/* fzf ignore fuzzy search directories/files */
+.git
+node_modules
+target

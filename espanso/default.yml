@@ -4,7 +4,25 @@
 # https://espanso.org/docs/
 # Matches are the substitution rules, when you type theessstrigger" string
 # it gets replaced by the "replace" string.
+auto_restart: true
+show_icon: false
+show_notifications: false
+secure_input_notification: false
+ 
 matches:
+  - trigger: ":eeee"
+    replace: "espanso edit\n"
+  - trigger: ":eeev"
+    replace: "espanso edit vim\n"
+  - trigger: ":eeeg"
+    replace: "espanso edit git\n"
+  - trigger: ":eeep"
+    replace: "espanso edit pier\n"
+  - trigger: ":eeer"
+    replace: "espanso edit rust\n"
+  - trigger: ":eeed"
+    replace: "espanso edit dictionary\n"
+
   # Simple text replacement
   - trigger: "theis is a ter"
     replace: "eesss"
@@ -34,7 +52,7 @@ matches:
   - trigger: ":catimage"
     image_path: "$CONFIG/images/cat.png"
   # Shell commands
-  - trigger: ":shell"
+  - trigger: ":exampleshell"
     replace: "{{output}}"
     vars:
       - name: output
@@ -42,14 +60,14 @@ matches:
         params:
           cmd: "echo Hello from your shell"
   # Shell commands
-  - trigger: ":ip"
+  - trigger: ":exampleip"
     replace: "{{output}}"
     vars:
       - name: output
         type: shell
         params:
           cmd: "curl 'https://api.ipify.org'"
-  - trigger: ":localip"
+  - trigger: ":examplelocalip"
     replace: "{{output}}"
     vars:
       - name: output
@@ -67,7 +85,7 @@ matches:
             - python
             - /path/to/your/script.py
   # Random
-  - trigger: ":quote"
+  - trigger: ":examplequote"
     replace: "{{output}}"
     vars:
       - name: output
@@ -78,7 +96,7 @@ matches:
             - "Everything you can imagine is real."
             - "Whatever you do, do it well."
   # Multi-lines
-  - trigger: "include newlines"
+  - trigger: "exampleinclude newlines"
     replace: |
               exactly as you see
               will appear these three

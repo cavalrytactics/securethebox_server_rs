@@ -3,11 +3,10 @@ use futures::lock::Mutex;
 use futures::{Stream, StreamExt};
 use slab::Slab;
 use std::sync::Arc;
-use std::time::Duration;
 
 pub type BooksSchema = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Book {
     id: ID,
     name: String,
@@ -38,26 +37,6 @@ impl QueryRoot {
     async fn books(&self, ctx: &Context<'_>) -> Vec<Book> {
         let books = ctx.data::<Storage>().lock().await;
         books.iter().map(|(_, book)| book).cloned().collect()
-    }
-    async fn book(&self, ctx: &Context<'_>, #[arg(desc = "id of the book")] id: ID) -> Book {
-        let books = ctx.data::<Storage>().lock().await;
-        let idsize = id.parse::<usize>();
-        let idusize = idsize.unwrap();
-        if books.contains(idusize) {
-            println!("BOOK ID FOUND: {:#?}", books[idusize]);
-            Book {
-                id: id,
-                name: books[idusize].name.to_string(),
-                author: books[idusize].name.to_string(),
-            }
-        } else {
-            println!("BOOK ID: Not Found {:?}", id);
-            Book {
-                id: id,
-                name: "N/A".to_string(),
-                author: "N/A".to_string(),
-            }
-        }
     }
 }
 
@@ -116,14 +95,6 @@ pub struct SubscriptionRoot;
 
 #[async_graphql::Subscription]
 impl SubscriptionRoot {
-    async fn interval(&self, #[arg(default = "1")] n: i32) -> impl Stream<Item = i32> {
-        let mut value = 0;
-        tokio::time::interval(Duration::from_secs(1)).map(move |_| {
-            value += n;
-            value
-        })
-    }
-
     async fn books(&self, mutation_type: Option<MutationType>) -> impl Stream<Item = BookChanged> {
         SimpleBroker::<BookChanged>::subscribe().filter(move |event| {
             let res = if let Some(mutation_type) = mutation_type {

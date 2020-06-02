@@ -1,13 +1,13 @@
-filter_exec: "/Applications/Visual Studio Code.app"
-# filter_class: "com.microsoft.VSCode"
-# fitler_title: "com.microsoft.VSCode"
+filter_exec: "/Applications/Alacritty.app/Contents/MacOS/alacritty"
+filter_title: "io.alacritty"
+filter_class: "io.alacritty"
 
 name: espanso
 prent: default
 
 matches:
   # Simple text replacements
-  - trigger: "trig"
+  - trigger: ":trigger"
     replace: |
               - trigger: "$|$"
                 replace: ""
