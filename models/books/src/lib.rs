@@ -50,13 +50,15 @@ impl MutationRoot {
         let id: ID = entry.key().into();
         let book = Book {
             id: id.clone(),
-            name,
-            author,
+            name: name.clone(),
+            author: author.clone(),
         };
         entry.insert(book);
         SimpleBroker::publish(BookChanged {
             mutation_type: MutationType::Created,
             id: id.clone(),
+            name: name.clone(),
+            author: author.clone(),
         });
         id
     }
@@ -69,6 +71,8 @@ impl MutationRoot {
             SimpleBroker::publish(BookChanged {
                 mutation_type: MutationType::Deleted,
                 id: id.into(),
+                name: "".to_string(),
+                author: "".to_string(),
             });
             Ok(true)
         } else {
@@ -89,6 +93,8 @@ enum MutationType {
 struct BookChanged {
     mutation_type: MutationType,
     id: ID,
+    name: String,
+    author: String,
 }
 
 pub struct SubscriptionRoot;
