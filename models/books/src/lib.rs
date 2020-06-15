@@ -11,6 +11,7 @@ pub struct Book {
     id: ID,
     name: String,
     author: String,
+    points: String,
 }
 
 #[async_graphql::Object]
@@ -25,6 +26,10 @@ impl Book {
 
     async fn author(&self) -> &str {
         &self.author
+    }
+
+    async fn points(&self) -> &str {
+        &self.points
     }
 }
 
@@ -54,7 +59,7 @@ pub struct MutationRoot;
 
 #[async_graphql::Object]
 impl MutationRoot {
-    async fn create_book(&self, ctx: &Context<'_>, name: String, author: String) -> ID {
+    async fn create_book(&self, ctx: &Context<'_>, name: String, author: String, points: String) -> ID {
         //
         // Database Init
         //
@@ -68,6 +73,7 @@ impl MutationRoot {
             id: id.clone(),
             name: name.clone(),
             author: author.clone(),
+            points: points.clone(),
         };
         //
         // Database Action
@@ -81,6 +87,7 @@ impl MutationRoot {
             id: id.clone(),
             name: name.clone(),
             author: author.clone(),
+            points: points.clone(),
         });
         //
         // Return Value
@@ -88,7 +95,7 @@ impl MutationRoot {
         id
     }
 
-    async fn update_book(&self, ctx: &Context<'_>, id: ID, name: String, author: String) -> FieldResult<bool> {
+    async fn update_book(&self, ctx: &Context<'_>, id: ID, name: String, author: String, points: String) -> FieldResult<bool> {
         let mut books = ctx.data::<Storage>().lock().await;
         let id = id.parse::<usize>()?;
         if books.contains(id) {
@@ -99,6 +106,7 @@ impl MutationRoot {
                 id: id.into(),
                 name: name.clone(),
                 author: author.clone(),
+                points: points.clone(),
             };
             //
             // Query Response
@@ -108,7 +116,11 @@ impl MutationRoot {
                 id: id.into(),
                 name: name.clone(),
                 author: author.clone(),
+                points: points.clone(),
             });
+            //
+            // Return Value
+            //
             Ok(true)
         } else {
             Ok(false)
@@ -134,7 +146,14 @@ impl MutationRoot {
                 id: id.into(),
                 name: "".to_string(),
                 author: "".to_string(),
+                points: "".to_string(),
             });
+        //
+        // Return Value
+        //
+            //
+            // Return Value
+            //
             Ok(true)
         } else {
             Ok(false)
@@ -157,6 +176,7 @@ struct BookChanged {
     id: ID,
     name: String,
     author: String,
+    points: String,
 }
 
 pub struct SubscriptionRoot;

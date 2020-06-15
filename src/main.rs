@@ -49,19 +49,18 @@ async fn main() -> std::io::Result<()> {
             .service(web::resource("/").guard(guard::Get()).to(index_playground))
             .wrap(Logger::new("REQUEST:\"%U\" STATUS: %s IP: %a"))
             .wrap(
+                //
+                // Default allow any origin
+                //
                 Cors::new()
-                    .allowed_origin("http://localhost:8000")
-                    .allowed_origin("http://localhost:7000")
-                    .allowed_origin("http://c2.local:8000")
-                    .allowed_origin("http://c2.local:7000")
-                    .allowed_origin("192.168.1.5")
-                    .allowed_origin("0.0.0.0")
-                    .allowed_origin("All")
-                    .allowed_origin("send_wildcard")
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-                    .allowed_header(http::header::CONTENT_TYPE)
-                    .max_age(3600)
+                    //
+                    // Filter origin
+                    //
+                    // .allowed_origin("http://localhost:8000")
+                    // .allowed_methods(vec!["GET", "POST"])
+                    // .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+                    // .allowed_header(http::header::CONTENT_TYPE)
+                    // .max_age(3600)
                     .finish(),
             )
     })
