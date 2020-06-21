@@ -9,6 +9,10 @@ default-run = "main"
 name = "main"
 path = "src/main.rs"
 
+[[bin]]
+name = "mongo"
+path = "src/bin/mongo_test.rs"
+
 [dependencies]
 # common
 flate2 = "1.0.14"
@@ -30,10 +34,15 @@ env_logger = "0.7.1"
 # async-graphql
 async-graphql = "1.12.17"
 async-graphql-actix-web = "1.4.17"
-books = { path = "./models/books" }
+securethebox = { path = "./models/securethebox" }
+# starwars = { path = "./models/starwars" }
+# books = { path = "./models/books" }
 
-# mongodb
+async-std = "1.5.0"
+
 bson = "0.14.1"
 cached = "0.12.0"
-mongodb = "0.10.0"
 dotenv = "0.15.0"
+mongodb = { version = "1.0.0", default-features = false, features = ["async-std-runtime"] }
+futures = "0.3.4"
+
