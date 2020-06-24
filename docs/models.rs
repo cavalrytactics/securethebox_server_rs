@@ -143,7 +143,7 @@ enum ProblemSkill {
     FIREWALL_RULES,
 }
 
-/// ProblemCatgory
+/// ProblemCategory
 ///
 /// REVIEW              => reviewing code
 /// SYSTEM              => configure system
@@ -218,7 +218,9 @@ struct Technology {
 /// vulnerabilities     => exposed vulnerabilities that can be exploited
 /// service             => services that are deployed to host this problem
 /// threats             => attackers participating in challenge
+/// max_points          => max points when solving problem
 /// max_strikes         => amount of attempt before failing problem
+/// diminishing_return  => point deduction when getting strike
 /// solution            => ID of solution
 ///
 struct Problem {
@@ -231,7 +233,9 @@ struct Problem {
     vulnerabilities: Vec<Vulnerability>,
     services: Vec<Service>,
     threats: Vec<Threat>,
+    max_points: i64,
     max_strikes: i64,
+    diminishing_returns: i64,
     solution: Solution,
 }
 

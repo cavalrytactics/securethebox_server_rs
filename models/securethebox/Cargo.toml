@@ -1,0 +1,17 @@
+[package]
+name = "securethebox"
+version = "0.1.0"
+authors = ["sunli <scott_s829@163.com>"]
+edition = "2018"
+
+[dependencies]
+async-graphql = "1.12.2"
+slab = "0.4.2"
+tokio = { version = "0.2", features = ["time", "stream"] }
+futures = "0.3.0"
+
+# mongodb
+bson = "0.14.1"
+cached = "0.12.0"
+mongodb = "0.11.0"
+dotenv = "0.15.0"

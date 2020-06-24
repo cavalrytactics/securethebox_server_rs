@@ -6,7 +6,7 @@ use std::sync::Arc;
 
 pub type BooksSchema = Schema<QueryRoot, MutationRoot, SubscriptionRoot>;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Book {
     id: ID,
     name: String,
@@ -73,7 +73,7 @@ impl MutationRoot {
             id: id.clone(),
             name: name.clone(),
             author: author.clone(),
-            points: points.clone(),
+            points: points.clone()
         };
         //
         // Database Action
@@ -87,7 +87,7 @@ impl MutationRoot {
             id: id.clone(),
             name: name.clone(),
             author: author.clone(),
-            points: points.clone(),
+            points: points.clone()
         });
         //
         // Return Value
@@ -102,15 +102,18 @@ impl MutationRoot {
             //
             // Database Action
             //
+            {
             books[id] = Book {
                 id: id.into(),
                 name: name.clone(),
                 author: author.clone(),
                 points: points.clone(),
             };
+            }
             //
             // Query Response
             //
+            {
             SimpleBroker::publish(BookChanged {
                 mutation_type: MutationType::Updated,
                 id: id.into(),
@@ -118,6 +121,7 @@ impl MutationRoot {
                 author: author.clone(),
                 points: points.clone(),
             });
+            }
             //
             // Return Value
             //

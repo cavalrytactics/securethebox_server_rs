@@ -3,26 +3,24 @@ use actix_web::middleware::Logger;
 use actix_web::{guard, http, web, App, HttpRequest, HttpResponse, HttpServer, Result};
 use actix_web_actors::ws;
 
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
+use async_graphql::http::playground_source;
 use async_graphql::Schema;
 use async_graphql_actix_web::{GQLRequest, GQLResponse, WSSubscription};
 
-use securethebox::{QueryRoot, MutationRoot, SubscriptionRoot, Securethebox, SecuretheboxSchema};
+use books::{BooksSchema, MutationRoot, QueryRoot, Storage, SubscriptionRoot};
 
-async fn index(schema: web::Data<SecuretheboxSchema>, req: GQLRequest) -> GQLResponse {
+async fn index(schema: web::Data<BooksSchema>, req: GQLRequest) -> GQLResponse {
     req.into_inner().execute(&schema).await.into()
 }
 
 async fn index_playground() -> Result<HttpResponse> {
     Ok(HttpResponse::Ok()
         .content_type("text/html; charset=utf-8")
-        .body(playground_source(
-            GraphQLPlaygroundConfig::new("/").subscription_endpoint("/"),
-        )))
+        .body(playground_source("/", Some("/"))))
 }
 
 async fn index_ws(
-    schema: web::Data<SecuretheboxSchema>,
+    schema: web::Data<BooksSchema>,
     req: HttpRequest,
     payload: web::Payload,
 ) -> Result<HttpResponse> {
@@ -35,7 +33,7 @@ async fn main() -> std::io::Result<()> {
     std::env::set_var("RUST_BACKTRACE", "full");
     env_logger::init();
     let schema = Schema::build(QueryRoot, MutationRoot, SubscriptionRoot)
-        .data(Securethebox::new())
+        .data(Storage::default())
         .finish();
 
     HttpServer::new(move || {
