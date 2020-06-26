@@ -1,12 +1,12 @@
 use super::Securethebox;
 
-use crate::shared;
+// use crate::shared;
 
-use futures::lock::Mutex;
+// use futures::lock::Mutex;
 use futures::{Stream, StreamExt};
-use slab::Slab;
-use std::sync::Arc;
-use std::collections::HashMap;
+// use slab::Slab;
+// use std::sync::Arc;
+// use std::collections::HashMap;
 
 use async_graphql::connection::{query, Connection, Edge, EmptyFields};
 use async_graphql::{Context, FieldResult, SimpleBroker, ID};
@@ -146,20 +146,22 @@ pub struct MutationRoot;
 
 #[async_graphql::Object]
 impl MutationRoot {
-    async fn create_challenge( &self, ctx: &Context<'_>, #[arg(desc = "create challenge")] name: String) -> Option<Challenge> {
-        // 
+    async fn create_challenge( &self, ctx: &Context<'_>, #[arg(desc = "create challenge")] name: String) -> bool {
+        let _ = ctx;
+        let _ = name;
+        true
+        //
         // Database Init
         //
-        let mut challenges = Slab::new();
-        let new_challenge = challenges.insert( shared::SecuretheboxChallenge {
-            id: "1008",
-            name: "C8",
-            problems: vec![],
-        });
-
-
-        ctx.data::<Securethebox>().challenge("1008").map(Challenge)
-        
+        // let mut challenges = Slab::new();
+        // let new_challenge = challenges.insert( shared::SecuretheboxChallenge {
+        //     id: "1008",
+        //     name: "C8",
+        //     problems: vec![],
+        // });
+        //
+        //
+        // ctx.data::<Securethebox>().challenge("1008").map(Challenge)
         // let mut challenges = ctx.data::<Securethebox>().challenges();
         // let entry = securethebox.vacant_entry();
         // // let id: ID = entry.key().into();

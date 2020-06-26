@@ -13,18 +13,21 @@ async fn main() -> std::io::Result<()>{
     
     // c.list_collection_names().await;
     // c.create_collection_data(&"securethebox".to_string()).await;
-    let json_docs = c.collection_get_all().await;
+    // let json_docs = c.collection_get_all().await;
 
-    let first_doc = &json_docs[0]["_id"]["$oid"];
+    // let _ = &json_docs[0]["_id"]["$oid"];
 
     // println!("first_doc {:#}",first_doc);
-
-    // let json_doc = c.collection_get_nodes_by_object_id(first_doc.to_string()).await;
-    // println!("json_doc {:#}",json_doc);
-
+    let arg_document = doc!{"author":"George Orwell"};
+    let documents = c.collection_get_nodes_by_key_value(arg_document.clone()).await;
+    // let documents = c.collection_get_nodes_by_key_value(arg_document.clone()).await;
+    println!("test {:?}",documents.len());
+    
     // c.collection_update_node_with_object_id(first_doc.to_string()).await;
-    let data_doc = doc! { "author": "Snoopie" };
-    c.collection_update_node_with_object_id(first_doc.to_string(), data_doc).await;
-    c.collection_delete_node_with_object_id(first_doc.to_string()).await;
+    // let data_doc = doc! { "author": "Snoopie" };
+    // c.collection_update_node_with_object_id(first_doc.to_string(), data_doc).await;
+    // c.collection_delete_node_with_object_id(first_doc.to_string()).await;
+
+
     Ok(())
 }

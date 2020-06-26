@@ -14,16 +14,20 @@ pub struct MongoDatabase {
 
 impl MongoDatabase {
 
+    pub fn set_host(&mut self, host: &String) {
+        self.host = host.to_string()
+    }
+
     pub fn set_app_name(&mut self, app_name: &String) {
         self.app_name = app_name.to_string()
     }
 
     pub fn set_database_name(&mut self, database_name: &String) {
-        self.app_name = database_name.to_string()
+        self.database_name = database_name.to_string()
     }
 
     pub fn set_collection_name(&mut self, collection_name: &String) {
-        self.app_name = collection_name.to_string()
+        self.collection_name = collection_name.to_string()
     }
 
     /// create mongodb client
@@ -53,7 +57,7 @@ impl MongoDatabase {
             .await
             .unwrap();
 
-        client_options.app_name = Some("SecureTheBox".to_string());
+        client_options.app_name = Some(self.app_name.to_string());
 
         let client = Client::with_options(client_options).unwrap();
 
@@ -78,14 +82,14 @@ impl MongoDatabase {
         collection
     }
 
-    pub async fn list_collection_names(&mut self) -> Vec<String> {
+    pub async fn collection_list_names(&mut self) -> Vec<String> {
 
         self.mongo_database()
             .await
             .list_collection_names(None).await.unwrap()
     }
 
-    pub async fn create_collection(&mut self) -> bool {
+    pub async fn collection_create(&mut self) -> bool {
         let _ = self.mongo_database()
             .await
             .create_collection(&self.collection_name, None)
@@ -114,9 +118,7 @@ impl MongoDatabase {
     ///     let doc = doc! { "title": "1984", "author": "George Orwell" }
     ///
     ///     let _ = self.collection_insert_one(doc)
-    ///         .await
-    ///         .insert_one(doc, None)
-    ///         .await
+    ///         .await;
     ///
     ///     Ok(())
     /// }
@@ -156,8 +158,6 @@ impl MongoDatabase {
     ///     ];
     ///
     ///     let _ = self.collection_insert_many(docs)
-    ///         .await
-    ///         .insert_many(docs, None)
     ///         .await
     ///
     ///     Ok(())
@@ -253,7 +253,7 @@ impl MongoDatabase {
     /// }
     /// ```
     ///
-    pub async fn collection_get_nodes_by_key_value(&mut self, filter_doc: Document) -> Value {
+    pub async fn collection_get_nodes_by_key_value(&mut self, filter_doc: Document) -> Vec<Value> {
         // filter by { "key": "value" }
         let filter = filter_doc;
 
@@ -266,14 +266,20 @@ impl MongoDatabase {
         let mut cursor = collection.find(filter, find_options).await.unwrap();
 
         // create a new string
-        let mut found_doc = String::new();
+        let mut found_docs = Vec::new();
+        // let mut found_doc = String::new();
 
         // iterate over the results of the cursor.
         while let Some(result) = cursor.next().await {
             match result {
                 Ok(document) => {
-                    println!("document {}", document);
-                    found_doc = serde_json::to_string(&document).unwrap();
+                    found_docs.push(
+                        serde_json::from_str(
+                            serde_json::to_string(&document)
+                            .unwrap()
+                            .as_str())
+                        .unwrap());
+                    // found_doc = serde_json::to_string(&document).unwrap();
                 }
                 Err(e) => {
                     println!("Error adding document {}", e);
@@ -282,10 +288,11 @@ impl MongoDatabase {
         }
 
         // convert vector to json
-        let json_doc = serde_json::from_str(found_doc.as_str()).unwrap();
+        // let json_doc = serde_json::from_str(found_docs.as_str()).unwrap();
 
         // return
-        json_doc
+        // json_doc
+        found_docs
     }
 
     /// get data from object_id
@@ -366,9 +373,7 @@ impl MongoDatabase {
         let oid_res = ObjectId::with_string(&object_id.replace("\"",""));
 
         // define cursor and add filter and options
-        let cursor = collection.update_one(doc! { "_id": Bson::ObjectId(oid_res.unwrap()) }, data_doc, None).await;
-
-        println!("{:#?}", &cursor);
+        let _ = collection.update_one(doc! { "_id": Bson::ObjectId(oid_res.unwrap()) }, data_doc, None).await;
 
         // return
         true
@@ -409,12 +414,271 @@ impl MongoDatabase {
         let oid_res = ObjectId::with_string(&object_id.replace("\"",""));
 
         // define cursor and add filter and options
-        let cursor = collection.delete_one(doc! { "_id": Bson::ObjectId(oid_res.unwrap()) }, None).await;
-
-        println!("{:#?}", &cursor);
+        let _ = collection.delete_one(doc! { "_id": Bson::ObjectId(oid_res.unwrap()) }, None).await;
 
         // return
         true
+    }
+}
+
+pub fn set_host(arg_host: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    if c.host == arg_host{
+        true
+    } else {
+        false
+    }
+}
+
+pub fn set_app_name(arg_host: String, arg_app_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    if c.app_name == arg_app_name {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn set_database_name(arg_host: String, arg_app_name: String, arg_database_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    if c.database_name == arg_database_name {
+        true
+    } else {
+        false
+    }
+}
+
+pub fn set_collection_name(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    if c.collection_name == arg_collection_name {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn mongo_client(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let client = c.mongo_client().await;
+    let databases = client.list_databases(None, None).await;
+    if databases.unwrap().len() > 0 {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn mongo_database(arg_host: String,arg_app_name: String, arg_database_name: String,arg_collection_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let database = c.mongo_database().await;
+    let collections = database.list_collection_names(None).await;
+    if collections.unwrap().len() > 0 {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn mongo_collection(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let collection = c.mongo_collection().await;
+    let documents = collection.count_documents(None, None).await;
+    if documents.unwrap() > 0 {
+        true
+    } else {
+        false
+    }
+}
+
+
+pub async fn collection_create(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let collection = c.collection_create().await;
+    if collection == true {
+        true
+    } else {
+        false
+    }
+}
+
+
+pub async fn collection_list_names(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let collection_list = c.collection_list_names().await;
+    if collection_list.len() > 0 {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn collection_insert_one(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String, arg_document: Document) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let insert_one = c.collection_insert_one(arg_document).await;
+    if insert_one == true {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn collection_insert_many(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String, arg_documents: Vec<Document>) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let insert_many = c.collection_insert_many(arg_documents).await;
+    if insert_many == true {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn collection_get_all(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let documents = c.collection_get_all().await;
+    if documents.as_array().unwrap().len() > 0 {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn collection_get_node_by_object_id(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String,arg_object_id: String) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let document = c.collection_get_node_by_object_id(arg_object_id).await;
+    if document["_id"] != serde_json::Value::Null {
+        true
+    } else {
+        false
+    }
+}
+
+pub async fn collection_get_nodes_by_key_value(arg_host: String, arg_app_name: String, arg_database_name: String,arg_collection_name: String,arg_document: Document) -> bool {
+    let mut c = MongoDatabase {
+        host: String::new(),
+        app_name: String::new(),
+        database_name: String::new(),
+        collection_name: String::new(),
+    };
+    c.set_host(&arg_host);
+    c.set_app_name(&arg_app_name);
+    c.set_database_name(&arg_database_name);
+    c.set_collection_name(&arg_collection_name);
+    let documents = c.collection_get_nodes_by_key_value(arg_document.clone()).await;
+    if documents.len() > 0 {
+        true
+    } else {
+        false
     }
 }
 
